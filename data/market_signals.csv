@@ -1,0 +1,4 @@
+skill_id,demand_score,trend,source,date
+SKILL_01,95,rising,Job Market Index,2026-09-01
+SKILL_02,88,rising,Tech Careers Report,2026-09-01
+SKILL_03,92,stable,AI Workforce Survey,2026-09-01

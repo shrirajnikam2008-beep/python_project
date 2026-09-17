@@ -1,0 +1,4 @@
+skill_id,skill_name,category,difficulty,target_careers
+SKILL_01,Python,Programming,Beginner,AI/ML Engineer;Data Scientist;Backend Developer
+SKILL_02,FastAPI,Backend,Intermediate,Backend Developer;AI/ML Engineer
+SKILL_03,Machine Learning,Data Science,Advanced,AI/ML Engineer;Data Scientist

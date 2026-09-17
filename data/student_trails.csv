@@ -1,0 +1,3 @@
+trail_id,student_id,current_skills,target_career,route_sequence,outcome
+T001,S101,Python,AI/ML Engineer,"Python->FastAPI->Machine Learning",Completed
+T002,S102,Python;FastAPI,Backend Developer,"FastAPI->PostgreSQL",Completed

@@ -1,18 +1,30 @@
-import React from 'react';
+import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+import '../styles/globals.css'
 
-export const metadata = {
-  title: 'Waypoint - Academic & Career Navigation',
-  description: 'Interactive Academic & Career Navigation Platform',
-};
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+})
+
+export const metadata: Metadata = {
+  title: 'Waypoint — Navigate your next.',
+  description:
+    'Academic and career navigation for students. Understand your skill gaps, explore learning routes, and navigate toward your career destination.',
+  keywords: 'career navigation, skill gaps, academic planning, student, learning routes, career path',
+}
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" className={inter.variable}>
+      <body className="min-h-screen bg-slate-50/60 font-sans text-slate-900 antialiased selection:bg-blue-100 selection:text-blue-900">
+        {children}
+      </body>
     </html>
-  );
+  )
 }

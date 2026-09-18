@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { AppShell } from '@/components/layout/AppShell'
+import { AuthGuard } from '@/components/auth/AuthGuard'
 import { SkillCard } from '@/components/skill-gaps/SkillCard'
 import { SkeletonCard } from '@/components/ui/SkeletonLoader'
 import { ErrorState } from '@/components/ui/ErrorState'
@@ -53,6 +54,7 @@ export default function SkillGapsPage() {
       : skills
 
   return (
+    <AuthGuard>
     <AppShell title="Skill Gaps" breadcrumb={[{ label: 'Dashboard' }, { label: 'Skill Gaps' }]}>
       <div className="space-y-8">
         {/* Header Title Banner */}
@@ -174,5 +176,6 @@ export default function SkillGapsPage() {
         )}
       </div>
     </AppShell>
+    </AuthGuard>
   )
 }

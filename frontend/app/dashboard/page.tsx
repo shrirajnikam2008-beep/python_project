@@ -3,11 +3,13 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { AppShell } from '@/components/layout/AppShell'
+import { AuthGuard } from '@/components/auth/AuthGuard'
 import { ProgressRing } from '@/components/ui/ProgressRing'
 import { Badge } from '@/components/ui/Badge'
 import { SkeletonCard } from '@/components/ui/SkeletonLoader'
 import { ErrorState } from '@/components/ui/ErrorState'
 import { getStudentProfile, getRoutes } from '@/lib/api'
+import { useAuth } from '@/contexts/AuthContext'
 import type { StudentProfile, Route } from '@/lib/types'
 import { getHour } from '@/lib/utils'
 import Link from 'next/link'
@@ -52,6 +54,7 @@ export default function DashboardPage() {
   const [routes, setRoutes] = useState<Route[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const { user } = useAuth()
 
   useEffect(() => {
     Promise.all([getStudentProfile(), getRoutes()])
@@ -63,38 +66,53 @@ export default function DashboardPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  const completedCount = profile?.currentSkills.length ?? 4
+  const completedCount = profile?.currentSkills.length ?? 0
   const totalSkills = 19
   const remainingSkills = totalSkills - completedCount
   const progress = Math.round((completedCount / totalSkills) * 100)
 
+  // Dynamic subtitle based on what the student told us in onboarding
+  const profileSubtitle = profile
+    ? [
+        profile.semester ? `Semester ${profile.semester}` : null,
+        profile.program ?? null,
+      ]
+        .filter(Boolean)
+        .join(' • ')
+    : null
+
+  const displayName = user?.name ?? profile?.name ?? 'there'
+
   return (
-    <AppShell title="Overview" breadcrumb={[{ label: 'Waypoint' }, { label: 'Dashboard' }]}>
-      {error ? (
-        <ErrorState message={error} onRetry={() => window.location.reload()} />
-      ) : (
-        <div className="space-y-6">
-          {/* Welcome Banner */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80"
-          >
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">
-                  Good {getHour()}
-                </span>
-                <span className="text-xs text-slate-400">Semester 5 • B.Tech IT</span>
+    <AuthGuard>
+      <AppShell title="Overview" breadcrumb={[{ label: 'Waypoint' }, { label: 'Dashboard' }]}>
+        {error ? (
+          <ErrorState message={error} onRetry={() => window.location.reload()} />
+        ) : (
+          <div className="space-y-6">
+            {/* Welcome Banner */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80"
+            >
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">
+                    Good {getHour()}
+                  </span>
+                  {profileSubtitle && (
+                    <span className="text-xs text-slate-400">{profileSubtitle}</span>
+                  )}
+                </div>
+                <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+                  {loading ? 'Welcome back' : `Welcome, ${displayName} 👋`}
+                </h1>
+                <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+                  Here is your real-time academic progression toward becoming an <strong>AI / ML Engineer</strong>.
+                </p>
               </div>
-              <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-                {loading ? 'Welcome back' : `Welcome, ${profile?.name ?? 'Alex'} 👋`}
-              </h1>
-              <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-                Here is your real-time academic progression toward becoming an <strong>AI / ML Engineer</strong>.
-              </p>
-            </div>
 
             <div className="flex items-center gap-2.5">
               <Link
@@ -264,6 +282,29 @@ export default function DashboardPage() {
           <motion.div custom={2} initial="hidden" animate="visible" variants={fadeUp}>
             {loading ? (
               <SkeletonCard />
+            ) : completedCount === 0 ? (
+              <div className="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-sm">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0">
+                      <Compass className="w-6 h-6 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-slate-900">Your Journey Starts Here</h3>
+                      <p className="text-xs text-slate-500 mt-1 max-w-lg">
+                        You are at ground zero — the best place to start! Waypoint has mapped out every foundational milestone you need to reach your destination.
+                      </p>
+                    </div>
+                  </div>
+                  <Link
+                    href="/route/balanced"
+                    className="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition-all shadow-xs"
+                  >
+                    <span>View Full Route Map</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              </div>
             ) : (
               <div className="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-sm">
                 <div className="flex items-center justify-between mb-5">
@@ -452,5 +493,6 @@ export default function DashboardPage() {
         </div>
       )}
     </AppShell>
+    </AuthGuard>
   )
 }

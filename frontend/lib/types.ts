@@ -1,11 +1,19 @@
+// ─── Student Stage ──────────────────────────────────────────────────────────
+export type StudentStage =
+  | 'just-exploring'
+  | 'planning-to-enroll'
+  | 'currently-enrolled'
+  | 'working-professional'
+
 // ─── Student Profile ───────────────────────────────────────────────────────
 export interface StudentProfile {
   name: string
   program: string
   branch: string
-  semester: number
-  cgpa: number
-  creditsCompleted: number
+  studentStage: StudentStage
+  semester?: number              // optional — not relevant for non-enrolled students
+  cgpa?: number                  // optional — not relevant for non-enrolled / beginners
+  creditsCompleted?: number      // optional
   currentSkills: string[]
   selectedDestinationId: string
 }

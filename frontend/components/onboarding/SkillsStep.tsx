@@ -49,9 +49,7 @@ interface SkillsStepProps {
 
 export function SkillsStep({ onNext, defaultValues }: SkillsStepProps) {
   const [selected, setSelected] = useState<string[]>(
-    defaultValues?.currentSkills && defaultValues.currentSkills.length > 0
-      ? defaultValues.currentSkills
-      : ['python', 'cpp', 'html-css', 'git']
+    defaultValues?.currentSkills ?? []
   )
 
   const toggle = (id: string) => {
@@ -62,8 +60,19 @@ export function SkillsStep({ onNext, defaultValues }: SkillsStepProps) {
 
   return (
     <div className="space-y-6">
-      <div className="p-3 bg-blue-50/70 border border-blue-100 rounded-xl text-xs text-blue-700 leading-relaxed">
-        Select what you already feel comfortable with. Waypoint will automatically compute what skills you need next.
+      {/* Beginner shortcut */}
+      <div className="p-3.5 bg-blue-50/70 border border-blue-100 rounded-xl">
+        <p className="text-xs text-blue-700 leading-relaxed mb-2.5">
+          Select what you already feel comfortable with. Waypoint will automatically compute what skills you need next.
+        </p>
+        <button
+          type="button"
+          onClick={() => onNext({ currentSkills: [] })}
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-800 bg-white border border-blue-200 hover:border-blue-400 px-3 py-1.5 rounded-lg transition-all"
+        >
+          <Sparkles className="w-3.5 h-3.5" />
+          I&apos;m a complete beginner — start from scratch
+        </button>
       </div>
 
       <div className="space-y-4">
@@ -99,7 +108,9 @@ export function SkillsStep({ onNext, defaultValues }: SkillsStepProps) {
 
       <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
         <span className="text-xs font-medium text-slate-500">
-          {selected.length} skills selected
+          {selected.length === 0
+            ? 'No skills selected — that\'s fine!'
+            : `${selected.length} skill${selected.length === 1 ? '' : 's'} selected`}
         </span>
 
         <Button

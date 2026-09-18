@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -10,7 +10,8 @@ import { ProfileStep } from '@/components/onboarding/ProfileStep'
 import { AcademicStep } from '@/components/onboarding/AcademicStep'
 import { SkillsStep } from '@/components/onboarding/SkillsStep'
 import { DestinationStep } from '@/components/onboarding/DestinationStep'
-import { createStudentProfile } from '@/lib/api'
+import { AuthGuard } from '@/components/auth/AuthGuard'
+import { createStudentProfile, getStudentProfile } from '@/lib/api'
 import type { StudentProfile } from '@/lib/types'
 
 const STEPS = [
@@ -21,10 +22,10 @@ const STEPS = [
 ]
 
 const STEP_DESCRIPTIONS = [
-  'Tell us your branch and current stage of study.',
-  'Your academic performance helps calibrate workload recommendations.',
-  'Select the programming and mathematical concepts you have already acquired.',
-  'Select the career destination you want to reach.',
+  'Tell us where you are in your academic journey.',
+  'Your academic details help calibrate workload recommendations. Skip if not applicable.',
+  'Select the concepts you already feel comfortable with — or skip if you\'re just starting out.',
+  'Select the career destination you want to navigate toward.',
 ]
 
 export default function OnboardingPage() {
@@ -32,15 +33,17 @@ export default function OnboardingPage() {
   const [step, setStep] = useState(0)
   const [saving, setSaving] = useState(false)
   const [profile, setProfile] = useState<Partial<StudentProfile>>({
-    name: 'Alex',
-    program: 'B.Tech Information Technology',
-    branch: 'Information Technology',
-    semester: 5,
-    cgpa: 8.2,
-    creditsCompleted: 60,
-    currentSkills: ['python', 'cpp', 'html-css', 'git'],
-    selectedDestinationId: 'ai-ml-engineer',
+    currentSkills: [],
   })
+
+  // If this user already completed onboarding, send them to dashboard
+  useEffect(() => {
+    getStudentProfile().then((p) => {
+      if (p && p.selectedDestinationId) {
+        router.replace('/dashboard')
+      }
+    }).catch(() => { /* first time user, no stored profile — that's fine */ })
+  }, [router])
 
   const handleNext = (data: Partial<StudentProfile>) => {
     const updated = { ...profile, ...data }
@@ -53,13 +56,14 @@ export default function OnboardingPage() {
   const handleFinal = async (data: { selectedDestinationId: string }) => {
     setSaving(true)
     const finalProfile: StudentProfile = {
-      name: profile.name ?? 'Alex',
-      program: profile.program ?? 'B.Tech Information Technology',
-      branch: profile.branch ?? 'Information Technology',
-      semester: profile.semester ?? 5,
-      cgpa: profile.cgpa ?? 8.2,
-      creditsCompleted: profile.creditsCompleted ?? 60,
-      currentSkills: profile.currentSkills ?? ['python', 'cpp', 'html-css', 'git'],
+      name: profile.name ?? 'Student',
+      program: profile.program ?? 'Not specified',
+      branch: profile.branch ?? 'Not specified',
+      studentStage: profile.studentStage ?? 'just-exploring',
+      semester: profile.semester,
+      cgpa: profile.cgpa,
+      creditsCompleted: profile.creditsCompleted,
+      currentSkills: profile.currentSkills ?? [],
       selectedDestinationId: data.selectedDestinationId || 'ai-ml-engineer',
     }
     await createStudentProfile(finalProfile)
@@ -67,6 +71,7 @@ export default function OnboardingPage() {
   }
 
   return (
+    <AuthGuard>
     <div className="min-h-screen bg-slate-50/60 flex flex-col antialiased selection:bg-blue-100 selection:text-blue-900">
       {/* Top Wizard Navigation */}
       <nav className="border-b border-slate-200/80 bg-white sticky top-0 z-30 shadow-2xs">
@@ -129,35 +134,39 @@ export default function OnboardingPage() {
                 {step === 0 && (
                   <ProfileStep
                     onNext={(d) => handleNext(d as Partial<StudentProfile>)}
-                    defaultValues={{
-                      name: profile.name ?? 'Alex',
-                      branch: profile.branch ?? 'Information Technology',
-                      program: profile.program ?? 'B.Tech Information Technology',
-                      semester: profile.semester ?? 5,
-                    }}
+                    defaultValues={
+                      profile.name
+                        ? {
+                            name: profile.name,
+                            branch: profile.branch ?? '',
+                            program: profile.program ?? '',
+                            semester: profile.semester,
+                            studentStage: profile.studentStage,
+                          }
+                        : undefined
+                    }
                   />
                 )}
                 {step === 1 && (
                   <AcademicStep
                     onNext={(d) => handleNext(d as Partial<StudentProfile>)}
-                    defaultValues={{
-                      cgpa: profile.cgpa ?? 8.2,
-                      creditsCompleted: profile.creditsCompleted ?? 60,
-                    }}
+                    defaultValues={
+                      profile.cgpa !== undefined
+                        ? { cgpa: profile.cgpa, creditsCompleted: profile.creditsCompleted }
+                        : undefined
+                    }
                   />
                 )}
                 {step === 2 && (
                   <SkillsStep
                     onNext={(d) => handleNext(d as Partial<StudentProfile>)}
-                    defaultValues={{
-                      currentSkills: profile.currentSkills ?? ['python', 'cpp', 'html-css', 'git'],
-                    }}
+                    defaultValues={{ currentSkills: profile.currentSkills ?? [] }}
                   />
                 )}
                 {step === 3 && (
                   <DestinationStep
                     onNext={handleFinal}
-                    defaultValue={profile.selectedDestinationId ?? 'ai-ml-engineer'}
+                    defaultValue={profile.selectedDestinationId ?? ''}
                   />
                 )}
               </motion.div>
@@ -179,5 +188,6 @@ export default function OnboardingPage() {
         </div>
       </div>
     </div>
+    </AuthGuard>
   )
 }

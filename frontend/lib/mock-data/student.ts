@@ -1,7 +1,8 @@
-﻿import type { StudentProfile } from '@/lib/types'
+import type { StudentProfile } from '@/lib/types'
 
 export const mockStudent: StudentProfile = {
   name: 'Alex',
+  studentStage: 'currently-enrolled',
   program: 'B.Tech Information Technology',
   branch: 'Information Technology',
   semester: 5,

@@ -87,3 +87,92 @@ export async function getRouteGraph(routeId: string): Promise<{
     edges: balancedRouteEdges,
   }
 }
+
+// ─── Auth (Mock — backed by localStorage) ─────────────────────────────────
+// When FastAPI backend is ready: replace these with fetch('/api/auth/...') calls.
+// All UI consumers use this abstraction and will not need changes.
+
+export interface AuthUser {
+  id: string
+  name: string
+  email: string
+}
+
+interface StoredAccount {
+  id: string
+  name: string
+  email: string
+  passwordHash: string // btoa-encoded placeholder
+}
+
+const ACCOUNTS_KEY = 'waypoint_accounts'
+const SESSION_KEY = 'waypoint_session'
+
+function getAccounts(): StoredAccount[] {
+  if (typeof window === 'undefined') return []
+  const raw = localStorage.getItem(ACCOUNTS_KEY)
+  return raw ? JSON.parse(raw) : []
+}
+
+function saveAccounts(accounts: StoredAccount[]) {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts))
+  }
+}
+
+export async function authSignup(
+  name: string,
+  email: string,
+  password: string
+): Promise<AuthUser> {
+  await delay(700)
+  const accounts = getAccounts()
+  if (accounts.find((a) => a.email.toLowerCase() === email.toLowerCase())) {
+    throw new Error('An account with this email already exists.')
+  }
+  const newAccount: StoredAccount = {
+    id: `user_${Date.now()}`,
+    name,
+    email: email.toLowerCase(),
+    passwordHash: btoa(email.toLowerCase() + ':' + password),
+  }
+  saveAccounts([...accounts, newAccount])
+  const user: AuthUser = { id: newAccount.id, name: newAccount.name, email: newAccount.email }
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(SESSION_KEY, JSON.stringify(user))
+  }
+  return user
+}
+
+export async function authLogin(email: string, password: string): Promise<AuthUser> {
+  await delay(700)
+  const accounts = getAccounts()
+  const account = accounts.find(
+    (a) =>
+      a.email.toLowerCase() === email.toLowerCase() &&
+      a.passwordHash === btoa(email.toLowerCase() + ':' + password)
+  )
+  if (!account) {
+    throw new Error('Invalid email or password.')
+  }
+  const user: AuthUser = { id: account.id, name: account.name, email: account.email }
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(SESSION_KEY, JSON.stringify(user))
+  }
+  return user
+}
+
+export async function authLogout(): Promise<void> {
+  await delay(200)
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem(SESSION_KEY)
+    // Keep profile data so returning users don't lose their journey
+  }
+}
+
+export function getCurrentUser(): AuthUser | null {
+  if (typeof window === 'undefined') return null
+  const raw = localStorage.getItem(SESSION_KEY)
+  return raw ? (JSON.parse(raw) as AuthUser) : null
+}
+

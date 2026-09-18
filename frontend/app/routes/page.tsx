@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { AppShell } from '@/components/layout/AppShell'
+import { AuthGuard } from '@/components/auth/AuthGuard'
 import { RouteCard } from '@/components/routes/RouteCard'
 import { SkeletonCard } from '@/components/ui/SkeletonLoader'
 import { ErrorState } from '@/components/ui/ErrorState'
@@ -27,6 +28,7 @@ export default function RoutesPage() {
   const selectedRoute = routes.find((r) => r.id === selectedId)
 
   return (
+    <AuthGuard>
     <AppShell title="Routes" breadcrumb={[{ label: 'Dashboard' }, { label: 'Routes' }]}>
       <div className="space-y-8">
         {/* Header */}
@@ -104,5 +106,6 @@ export default function RoutesPage() {
         )}
       </div>
     </AppShell>
+    </AuthGuard>
   )
 }

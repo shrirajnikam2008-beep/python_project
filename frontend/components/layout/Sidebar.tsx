@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import {
   LayoutDashboard,
@@ -11,9 +11,10 @@ import {
   Navigation,
   Compass,
   GraduationCap,
-  Sparkles,
+  LogOut,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useAuth } from '@/contexts/AuthContext'
 
 const navItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Overview', badge: null },
@@ -24,6 +25,17 @@ const navItems = [
 
 export function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void }) {
   const pathname = usePathname()
+  const router = useRouter()
+  const { user, logout } = useAuth()
+
+  const initials = user?.name
+    ? user.name.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2)
+    : '?'
+
+  const handleLogout = async () => {
+    await logout()
+    router.push('/')
+  }
 
   return (
     <aside className="flex h-full w-64 flex-col bg-[#0B0F19] text-slate-300 border-r border-slate-800/80 select-none">
@@ -121,24 +133,31 @@ export function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void }) {
         })}
       </div>
 
-      {/* Student Profile Footer */}
+      {/* User Profile Footer */}
       <div className="p-3 border-t border-slate-800/80 bg-[#0B0F19]/90">
         <div className="flex items-center gap-3 p-2 rounded-xl bg-slate-900/60 border border-slate-800/80">
           <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 font-bold text-xs text-white shadow-inner">
-            A
+            {initials}
             <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-[#0B0F19] bg-emerald-500" />
           </div>
           <div className="min-w-0 flex-1">
-            <div className="flex items-center justify-between">
-              <p className="text-xs font-semibold text-white truncate">Alex Sharma</p>
-              <span className="text-[10px] font-medium text-blue-400 bg-blue-500/10 px-1 rounded">Sem 5</span>
-            </div>
+            <p className="text-xs font-semibold text-white truncate">{user?.name ?? 'Student'}</p>
             <p className="text-[11px] text-slate-400 truncate flex items-center gap-1">
-              <GraduationCap className="w-3 h-3 text-slate-400" /> B.Tech IT (8.2 CGPA)
+              <GraduationCap className="w-3 h-3 text-slate-400 shrink-0" />
+              {user?.email ?? 'Not signed in'}
             </p>
           </div>
+          <button
+            type="button"
+            onClick={handleLogout}
+            title="Sign out"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors shrink-0"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+          </button>
         </div>
       </div>
     </aside>
   )
 }
+

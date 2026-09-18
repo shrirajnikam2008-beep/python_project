@@ -36,13 +36,21 @@ export default function OnboardingPage() {
     currentSkills: [],
   })
 
-  // If this user already completed onboarding, send them to dashboard
+  // If this user already completed their own onboarding, send them to dashboard
   useEffect(() => {
-    getStudentProfile().then((p) => {
-      if (p && p.selectedDestinationId) {
-        router.replace('/dashboard')
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('waypoint_profile')
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored)
+          if (parsed && parsed.selectedDestinationId) {
+            router.replace('/dashboard')
+          }
+        } catch {
+          // ignore corrupted json
+        }
       }
-    }).catch(() => { /* first time user, no stored profile — that's fine */ })
+    }
   }, [router])
 
   const handleNext = (data: Partial<StudentProfile>) => {

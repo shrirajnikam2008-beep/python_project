@@ -41,15 +41,15 @@ export default function LandingPage() {
               <>
                 <Link
                   href="/login"
-                  className="text-xs sm:text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-slate-100 border border-slate-200 hover:border-slate-300"
+                  className="text-xs sm:text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-slate-100 border border-slate-200 hover:border-slate-300"
                 >
                   Log in
                 </Link>
                 <Link
                   href="/signup"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold rounded-xl transition-all shadow-xs hover:shadow-md"
+                  className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold rounded-xl transition-all shadow-xs hover:shadow-md"
                 >
-                  Sign up free <ArrowRight className="w-3.5 h-3.5" />
+                  <span>Sign up</span> <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </>
             )}

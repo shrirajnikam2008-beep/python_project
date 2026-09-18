@@ -12,12 +12,14 @@ import {
   Compass,
   GraduationCap,
   LogOut,
+  UserCheck,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/contexts/AuthContext'
 
 const navItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Overview', badge: null },
+  { href: '/onboarding', icon: UserCheck, label: 'Profile & Goal', badge: null },
   { href: '/route/balanced', icon: Map, label: 'My Route', badge: 'Active' },
   { href: '/skill-gaps', icon: BarChart3, label: 'Skill Gaps', badge: '11 gaps' },
   { href: '/routes', icon: Route, label: 'Routes', badge: '3 paths' },

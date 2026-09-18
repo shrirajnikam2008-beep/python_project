@@ -116,6 +116,12 @@ export default function DashboardPage() {
 
             <div className="flex items-center gap-2.5">
               <Link
+                href="/onboarding"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl border border-slate-200/90 shadow-xs transition-all hover:border-slate-300"
+              >
+                Edit Profile
+              </Link>
+              <Link
                 href="/route/balanced"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold rounded-xl shadow-xs transition-all hover:shadow-md"
               >

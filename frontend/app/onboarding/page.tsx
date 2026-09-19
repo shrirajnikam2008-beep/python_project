@@ -36,22 +36,22 @@ export default function OnboardingPage() {
     currentSkills: [],
   })
 
-  // If this user already completed their own onboarding, send them to dashboard
+  // Preload any existing profile data for editing
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem('waypoint_profile')
       if (stored) {
         try {
           const parsed = JSON.parse(stored)
-          if (parsed && parsed.selectedDestinationId) {
-            router.replace('/dashboard')
+          if (parsed) {
+            setProfile(parsed)
           }
         } catch {
           // ignore corrupted json
         }
       }
     }
-  }, [router])
+  }, [])
 
   const handleNext = (data: Partial<StudentProfile>) => {
     const updated = { ...profile, ...data }

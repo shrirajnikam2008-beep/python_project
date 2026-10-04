@@ -111,10 +111,11 @@ export async function getRouteGraph(
 
 export async function getOpportunities(
   destinationId?: string,
-  type?: OpportunityType | 'all'
+  type?: OpportunityType | 'all',
+  filterMode?: 'all' | 'trending' | 'closing-soon' | 'new-today'
 ): Promise<Opportunity[]> {
   await delay(300)
-  return _getOpportunities(destinationId, type)
+  return _getOpportunities(destinationId, type, filterMode)
 }
 
 

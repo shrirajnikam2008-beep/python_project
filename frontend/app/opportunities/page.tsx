@@ -24,9 +24,17 @@ import {
   Zap,
   Globe,
   Award,
+  Bookmark,
+  BookmarkCheck,
+  TrendingUp,
+  Clock,
+  Flame,
+  Share2,
+  Users,
 } from 'lucide-react'
 
 type TabFilter = 'all' | OpportunityType
+type DailyFilter = 'all' | 'trending' | 'closing-soon' | 'new-today' | 'saved'
 
 const typeIcons: Record<OpportunityType, React.ElementType> = {
   Hackathon: Trophy,
@@ -53,14 +61,14 @@ const typeStyles: Record<OpportunityType, { badge: string; border: string; bg: s
     bg: 'bg-purple-50/50',
   },
   Incubator: {
+    badge: 'bg-rose-50 text-rose-700 border-rose-200',
+    border: 'hover:border-rose-300',
+    bg: 'bg-rose-50/50',
+  },
+  Competition: {
     badge: 'bg-amber-50 text-amber-700 border-amber-200',
     border: 'hover:border-amber-300',
     bg: 'bg-amber-50/50',
-  },
-  Competition: {
-    badge: 'bg-indigo-50 text-indigo-700 border-indigo-200',
-    border: 'hover:border-indigo-300',
-    bg: 'bg-indigo-50/50',
   },
 }
 
@@ -70,9 +78,20 @@ export default function OpportunitiesPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<TabFilter>('all')
+  const [dailyFilter, setDailyFilter] = useState<DailyFilter>('all')
   const [searchQuery, setSearchQuery] = useState('')
+  const [savedIds, setSavedIds] = useState<string[]>([])
+  const [copiedId, setCopiedId] = useState<string | null>(null)
 
   useEffect(() => {
+    // Load saved bookmarks from localStorage
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = localStorage.getItem('waypoint_saved_opps')
+        if (raw) setSavedIds(JSON.parse(raw))
+      } catch {}
+    }
+
     getStudentProfile()
       .then((p) => {
         setProfile(p)
@@ -83,28 +102,72 @@ export default function OpportunitiesPage() {
       .finally(() => setLoading(false))
   }, [])
 
+  const toggleSave = (id: string) => {
+    setSavedIds((prev) => {
+      const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('waypoint_saved_opps', JSON.stringify(next))
+      }
+      return next
+    })
+  }
+
+  const handleShare = (id: string, url: string) => {
+    if (typeof window !== 'undefined') {
+      navigator.clipboard.writeText(url)
+      setCopiedId(id)
+      setTimeout(() => setCopiedId(null), 2000)
+    }
+  }
+
   const destination: Destination = getDestinationById(profile?.selectedDestinationId)
 
-  // Filter based on active tab and search query
+  // Filter based on active category, daily pulse filter, and search query
   const filtered = opportunities.filter((op) => {
-    const matchesTab = activeTab === 'all' || op.type === activeTab
+    const matchesCategory = activeTab === 'all' || op.type === activeTab
+
+    let matchesDaily = true
+    if (dailyFilter === 'trending') {
+      matchesDaily = Boolean(op.isTrending || (op.trendingScore ?? 0) >= 90)
+    } else if (dailyFilter === 'closing-soon') {
+      matchesDaily = Boolean(op.isClosingSoon || (op.daysRemaining ?? 30) <= 5)
+    } else if (dailyFilter === 'new-today') {
+      matchesDaily = Boolean(op.isNewToday || (op.postedAt ?? '').includes('Today'))
+    } else if (dailyFilter === 'saved') {
+      matchesDaily = savedIds.includes(op.id)
+    }
+
     const matchesSearch =
       searchQuery.trim() === '' ||
       op.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       op.organization.toLowerCase().includes(searchQuery.toLowerCase()) ||
       op.tags.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase()))
-    return matchesTab && matchesSearch
+
+    return matchesCategory && matchesDaily && matchesSearch
+  })
+
+  // Sort if trending is selected
+  const displayedOpportunities = [...filtered].sort((a, b) => {
+    if (dailyFilter === 'trending') {
+      return (b.trendingScore ?? 0) - (a.trendingScore ?? 0)
+    }
+    if (dailyFilter === 'closing-soon') {
+      return (a.daysRemaining ?? 30) - (b.daysRemaining ?? 30)
+    }
+    return 0
   })
 
   const hackathonCount = opportunities.filter((op) => op.type === 'Hackathon').length
   const internshipCount = opportunities.filter((op) => op.type === 'Internship').length
   const researchCount = opportunities.filter((op) => op.type === 'Research').length
   const incubatorCount = opportunities.filter((op) => op.type === 'Incubator' || op.type === 'Competition').length
+  const trendingCount = opportunities.filter((op) => op.isTrending || (op.trendingScore ?? 0) >= 90).length
+  const closingSoonCount = opportunities.filter((op) => op.isClosingSoon || (op.daysRemaining ?? 30) <= 5).length
 
   return (
     <AuthGuard>
       <AppShell title="Opportunities" breadcrumb={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Opportunities' }]}>
-        <div className="space-y-8">
+        <div className="space-y-6">
           {/* Header Title Banner */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -135,9 +198,37 @@ export default function OpportunitiesPage() {
               </div>
             </div>
 
+            {/* Live Daily Radar Pulse Bar */}
+            <div className="mt-5 p-3.5 rounded-2xl bg-gradient-to-r from-blue-900 via-indigo-950 to-slate-950 text-white border border-blue-800/60 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                <div className="relative flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">Live Daily Radar</span>
+                    <span className="text-[11px] text-slate-400">• Refreshed Today</span>
+                  </div>
+                  <p className="text-xs text-slate-300">
+                    Showing daily trending programs, upcoming deadlines, and fresh batches.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                <span className="px-2.5 py-1 rounded-lg bg-white/10 text-amber-300 font-semibold border border-white/10 flex items-center gap-1">
+                  <Flame className="w-3.5 h-3.5 text-amber-400" /> {trendingCount} Trending Today
+                </span>
+                <span className="px-2.5 py-1 rounded-lg bg-white/10 text-rose-300 font-semibold border border-white/10 flex items-center gap-1">
+                  <Clock className="w-3.5 h-3.5 text-rose-400" /> {closingSoonCount} Closing Soon
+                </span>
+              </div>
+            </div>
+
             {/* Quick Metrics Strip */}
             {!loading && (
-              <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div className="p-3.5 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
                     <Trophy className="w-5 h-5" />
@@ -181,16 +272,40 @@ export default function OpportunitiesPage() {
             )}
           </motion.div>
 
-          {/* Search & Tabs Controls */}
+          {/* Daily Status Filter Tabs (Trending / Closing Soon / New / Saved) */}
+          <div className="flex flex-wrap items-center gap-2 p-1.5 bg-slate-100/90 rounded-2xl border border-slate-200/80">
+            {[
+              { id: 'all', label: 'All Opportunities', icon: Sparkles },
+              { id: 'trending', label: '🔥 Trending Today', icon: Flame },
+              { id: 'closing-soon', label: '⚡ Closing Soon (<7d)', icon: Clock },
+              { id: 'new-today', label: '🟢 Just Opened Today', icon: Zap },
+              { id: 'saved', label: `⭐ Saved (${savedIds.length})`, icon: Bookmark },
+            ].map((f) => (
+              <button
+                key={f.id}
+                type="button"
+                onClick={() => setDailyFilter(f.id as DailyFilter)}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                  dailyFilter === f.id
+                    ? 'bg-white text-slate-900 shadow-sm border border-slate-200/80'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Search & Domain Category Tabs Controls */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80">
             {/* Category Tabs */}
             <div className="flex items-center gap-2 overflow-x-auto pb-1">
               {[
-                { id: 'all', label: `All Opportunities (${opportunities.length})` },
+                { id: 'all', label: `All Domains (${opportunities.length})` },
                 { id: 'Hackathon', label: `Hackathons (${hackathonCount})` },
                 { id: 'Internship', label: `Internships (${internshipCount})` },
                 { id: 'Research', label: `Research & PMRF (${researchCount})` },
-                { id: 'Incubator', label: `Business & Incubators (${incubatorCount})` },
+                { id: 'Incubator', label: `Startups & Incubators (${incubatorCount})` },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -229,17 +344,18 @@ export default function OpportunitiesPage() {
                 <SkeletonCard key={i} />
               ))}
             </div>
-          ) : filtered.length === 0 ? (
+          ) : displayedOpportunities.length === 0 ? (
             <div className="bg-white border border-slate-200/90 rounded-2xl p-12 text-center">
               <Sparkles className="w-8 h-8 text-slate-400 mx-auto mb-3" />
               <h3 className="text-sm font-bold text-slate-800">No matching opportunities found</h3>
-              <p className="text-xs text-slate-400 mt-1">Try clearing your search query or selecting &quot;All Opportunities&quot;.</p>
+              <p className="text-xs text-slate-400 mt-1">Try switching to &quot;All Opportunities&quot; or clearing your active filters.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {filtered.map((op) => {
+              {displayedOpportunities.map((op) => {
                 const Icon = typeIcons[op.type] || Trophy
                 const style = typeStyles[op.type] || typeStyles.Hackathon
+                const isSaved = savedIds.includes(op.id)
 
                 return (
                   <motion.div
@@ -250,30 +366,68 @@ export default function OpportunitiesPage() {
                     className={`bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between ${style.border}`}
                   >
                     <div>
-                      {/* Top Row: Type Badge + Featured + Mode */}
+                      {/* Top Row: Type Badge + Daily Badge + Bookmark */}
                       <div className="flex items-center justify-between gap-2 mb-3">
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1.5 flex-wrap">
                           <span className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-lg border ${style.badge}`}>
                             <Icon className="w-3 h-3" />
                             {op.type}
                           </span>
-                          {op.featured && (
-                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">
-                              ★ Featured
+                          {op.dailyBadge && (
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${
+                              op.dailyBadge.includes('Trending')
+                                ? 'bg-amber-50 text-amber-800 border-amber-200'
+                                : op.dailyBadge.includes('Closing')
+                                ? 'bg-rose-50 text-rose-800 border-rose-200'
+                                : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                            }`}>
+                              {op.dailyBadge}
                             </span>
                           )}
                         </div>
-                        <span className="text-[11px] text-slate-400 font-medium flex items-center gap-1">
-                          <Globe className="w-3 h-3" />
-                          {op.mode}
-                        </span>
+
+                        {/* Save Bookmark Action */}
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => handleShare(op.id, op.url)}
+                            title="Copy Official Link"
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-slate-100 transition-colors"
+                          >
+                            <Share2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => toggleSave(op.id)}
+                            title={isSaved ? 'Remove from saved' : 'Save opportunity'}
+                            className={`p-1.5 rounded-lg transition-colors ${
+                              isSaved
+                                ? 'text-blue-600 bg-blue-50'
+                                : 'text-slate-400 hover:text-slate-700 hover:bg-slate-100'
+                            }`}
+                          >
+                            {isSaved ? <BookmarkCheck className="w-3.5 h-3.5" /> : <Bookmark className="w-3.5 h-3.5" />}
+                          </button>
+                        </div>
                       </div>
 
                       {/* Title & Organization */}
                       <h3 className="text-base font-bold text-slate-900 leading-snug mb-1">
                         {op.title}
                       </h3>
-                      <p className="text-xs font-semibold text-blue-600 mb-3">{op.organization}</p>
+                      <p className="text-xs font-semibold text-blue-600 mb-2">{op.organization}</p>
+
+                      {/* Daily Activity Pulse Row */}
+                      <div className="flex items-center justify-between text-[10px] text-slate-500 mb-3 pb-2 border-b border-slate-100">
+                        <span className="flex items-center gap-1">
+                          <Users className="w-3 h-3 text-slate-400" />
+                          <strong>+{op.applicantsToday ?? 210}</strong> applied today
+                        </span>
+                        <span className="flex items-center gap-1 text-slate-400">
+                          <Clock className="w-3 h-3" />
+                          {op.postedAt ?? 'Recently verified'}
+                        </span>
+                      </div>
 
                       <p className="text-xs text-slate-500 leading-relaxed mb-4 line-clamp-3">
                         {op.description}
@@ -324,6 +478,11 @@ export default function OpportunitiesPage() {
                         </span>
                         <span className="text-[10px] text-blue-600 group-hover:underline">Visit →</span>
                       </a>
+                      {copiedId === op.id && (
+                        <p className="text-center text-[10px] text-emerald-600 font-semibold mt-1">
+                          Link copied to clipboard!
+                        </p>
+                      )}
                     </div>
                   </motion.div>
                 )

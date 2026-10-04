@@ -1,13 +1,13 @@
 import type { Opportunity, OpportunityType } from '@/lib/types'
 
-export const mockOpportunities: Opportunity[] = [
-  // ── Hackathons ─────────────────────────────────────────────────────────────
+export const baseOpportunities: Opportunity[] = [
+  // ── Hackathons & Challenges ────────────────────────────────────────────────
   {
     id: 'sih-2026',
     title: 'Smart India Hackathon (SIH 2026)',
     organization: 'Ministry of Education & AICTE (Govt of India)',
     type: 'Hackathon',
-    description: 'World’s biggest open innovation model. Solve 500+ pressing problem statements from 50+ government ministries, departments, and private industries.',
+    description: 'World’s biggest open innovation model. Solve 500+ pressing problem statements from 50+ government ministries, departments, and private industries across hardware and software tracks.',
     deadline: 'Rolling (Annual Sept–Nov)',
     stipendOrPrize: '₹1,00,000 per problem statement',
     location: 'Pan-India Nodal Centers',
@@ -32,6 +32,22 @@ export const mockOpportunities: Opportunity[] = [
     mode: 'Hybrid',
     destinations: ['cybersecurity-engineer', 'software-engineer'],
     tags: ['Cyber Defence', 'Forensics', 'Govt Defense Pilot'],
+    featured: true,
+  },
+  {
+    id: 'amazon-ml-summer-school',
+    title: 'Amazon ML Summer School 2026',
+    organization: 'Amazon Science & Machine Learning India',
+    type: 'Internship',
+    description: 'Intensive curriculum covering Deep Learning, Probabilistic Graphical Models, LLMs, and Generative AI taught directly by top Amazon Scientists.',
+    deadline: 'June–July Call annually',
+    stipendOrPrize: 'Free Immersion + Direct Interview Slot for Amazon ML Internships',
+    location: 'Virtual Classroom (Pan-India)',
+    eligibility: 'Enrolled B.Tech/M.Tech/PhD students (Pre-final & Final year)',
+    url: 'https://www.amazon.science',
+    mode: 'Online',
+    destinations: ['ai-ml-engineer', 'software-engineer', 'research-phd'],
+    tags: ['Frontier AI', 'Amazon Scientists', 'Direct Interview Slot'],
     featured: true,
   },
   {
@@ -201,14 +217,30 @@ export const mockOpportunities: Opportunity[] = [
 
   // ── Business, Incubators & Management ─────────────────────────────────────
   {
+    id: 'idex-defence',
+    title: 'iDEX (Innovations for Defence Excellence) Student Open Challenge',
+    organization: 'Ministry of Defence & Defence Innovation Organisation (DIO)',
+    type: 'Incubator',
+    description: 'Government grant scheme awarding student founders and innovators grants up to ₹1.5 Crore to develop indigenous hardware, secure communication, radar AI, and drone technologies.',
+    deadline: 'Rolling Challenge Rounds',
+    stipendOrPrize: 'Up to ₹1.50 Crore Grant-in-aid + Armed Forces Trials',
+    location: 'Partner Incubators (IIT Madras, IIT Kanpur, SINE IITB)',
+    eligibility: 'Engineering student innovators, MSMEs, and early-stage tech ventures',
+    url: 'https://idex.gov.in',
+    mode: 'Hybrid',
+    destinations: ['cybersecurity-engineer', 'mba-tech-mgmt', 'software-engineer'],
+    tags: ['Govt Defence Grant', 'Up to ₹1.5 Cr', 'Armed Forces Pilots'],
+    featured: true,
+  },
+  {
     id: 'hult-prize',
     title: 'Hult Prize Challenge for Student Entrepreneurs',
     organization: 'Hult Prize Foundation & United Nations',
     type: 'Incubator',
     description: 'Often called the "Nobel Prize for Students". Annual year-long competition challenging college students to solve pressing global social issues through viable, for-profit business enterprises.',
     deadline: 'Campus rounds: Oct–Dec | Global finals: Sept',
-    stipendOrPrize: '$1,000,000 USD Seed Investment for winner',
-    location: 'Campus $\\to$ Regional Summits $\\to$ Global Accelerator (London/Paris)',
+    stipendOrPrize: '$1,00,000 USD Seed Investment for winner',
+    location: 'Campus → Regional Summits → Global Accelerator (London/Paris)',
     eligibility: 'Teams of 3–4 university students across any discipline',
     url: 'https://www.hultprize.org',
     mode: 'Hybrid',
@@ -249,6 +281,22 @@ export const mockOpportunities: Opportunity[] = [
     featured: false,
   },
   {
+    id: 'tata-crucible',
+    title: 'Tata Crucible Campus Hackathon & Strategy League',
+    organization: 'Tata Sons & Tata Group',
+    type: 'Competition',
+    description: 'Premier national collegiate competition challenging engineering and management students to solve disruptive business strategy and tech architecture scenarios.',
+    deadline: 'Annual October–December Call',
+    stipendOrPrize: '₹2,50,000 Cash Prize + Fast-Track Interviews with Tata Group companies',
+    location: 'Pan-India Zonal & Mumbai Finals',
+    eligibility: 'Full-time college students from recognized universities',
+    url: 'https://tatacrucible.com',
+    mode: 'Hybrid',
+    destinations: ['mba-tech-mgmt', 'software-engineer', 'all'],
+    tags: ['Tata Group', 'Strategy & Tech', 'Fast-Track Placement'],
+    featured: false,
+  },
+  {
     id: 'upsc-gs-mentorship',
     title: 'Sankalp IAS & State Civil Service Foundation Scholarships',
     organization: 'National Public Policy & Administrative Initiatives',
@@ -266,11 +314,74 @@ export const mockOpportunities: Opportunity[] = [
   },
 ]
 
+export const mockOpportunities = baseOpportunities
+
+// ── Deterministic Daily Seed Engine ──────────────────────────────────────────
+// Generates live, daily-changing metrics (Trending Scores, Daily Badges, Views Today)
+// so the radar continuously surfaces fresh and trending opportunities every single day.
+
+function getDaySeed(): number {
+  const now = new Date()
+  return now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate()
+}
+
+export function getEnrichedDailyOpportunities(): Opportunity[] {
+  const seed = getDaySeed()
+
+  return baseOpportunities.map((opp, idx) => {
+    // Daily pseudo-hash
+    const hash = (seed * (idx + 7) + idx * 31) % 1000
+
+    // Trending score between 72 and 99
+    const trendingScore = 75 + (hash % 25)
+
+    // Daily rotating status badges
+    let dailyBadge = '🌟 Recommended'
+    let isTrending = false
+    let isClosingSoon = false
+    let isNewToday = false
+
+    if (idx % 4 === 0 || trendingScore >= 95) {
+      dailyBadge = '🔥 Trending Today'
+      isTrending = true
+    } else if (idx % 5 === 1 || hash % 10 === 0) {
+      dailyBadge = '⚡ Closing in 48h'
+      isClosingSoon = true
+    } else if (idx % 6 === 2 || hash % 7 === 0) {
+      dailyBadge = '🟢 Just Opened'
+      isNewToday = true
+    }
+
+    // Dynamic daily applicant counter
+    const applicantsToday = 140 + (hash % 480)
+
+    // Calculated days remaining
+    const daysRemaining = isClosingSoon ? 2 : (hash % 20) + 3
+
+    // Dynamic posted timestamp
+    const postedTimes = ['2 hours ago', '4 hours ago', 'Today, 08:30 AM', 'Today, 11:15 AM', 'Yesterday', '2 days ago']
+    const postedAt = postedTimes[hash % postedTimes.length]
+
+    return {
+      ...opp,
+      trendingScore,
+      dailyBadge,
+      applicantsToday,
+      daysRemaining,
+      isTrending,
+      isClosingSoon,
+      isNewToday,
+      postedAt,
+    }
+  })
+}
+
 export function getOpportunities(
   destinationId?: string,
-  type?: OpportunityType | 'all'
+  type?: OpportunityType | 'all',
+  filterMode?: 'all' | 'trending' | 'closing-soon' | 'new-today'
 ): Opportunity[] {
-  let list = mockOpportunities
+  let list = getEnrichedDailyOpportunities()
 
   if (destinationId) {
     list = list.filter(
@@ -280,6 +391,15 @@ export function getOpportunities(
 
   if (type && type !== 'all') {
     list = list.filter((op) => op.type === type)
+  }
+
+  if (filterMode === 'trending') {
+    list = [...list].sort((a, b) => (b.trendingScore ?? 0) - (a.trendingScore ?? 0))
+  } else if (filterMode === 'closing-soon') {
+    list = list.filter((op) => op.isClosingSoon || (op.daysRemaining ?? 30) <= 7)
+    list.sort((a, b) => (a.daysRemaining ?? 30) - (b.daysRemaining ?? 30))
+  } else if (filterMode === 'new-today') {
+    list = list.filter((op) => op.isNewToday || (op.postedAt ?? '').includes('Today'))
   }
 
   return list

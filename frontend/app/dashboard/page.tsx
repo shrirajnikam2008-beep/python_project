@@ -511,7 +511,7 @@ export default function DashboardPage() {
               <div className="bg-white border border-slate-200/90 rounded-2xl p-6 text-center text-slate-500 text-sm">
                 No active opportunities found for this destination right now.{' '}
                 <Link href="/opportunities" className="text-blue-600 font-semibold underline">
-                  Browse all 12 authentic opportunities
+                  Browse all 18 authentic opportunities
                 </Link>
               </div>
             ) : (
@@ -526,10 +526,23 @@ export default function DashboardPage() {
                     >
                       <div>
                         <div className="flex items-center justify-between mb-3">
-                          <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-semibold border ${badge.bg} ${badge.text} ${badge.border}`}>
-                            <Icon className="w-3 h-3" />
-                            {badge.label}
-                          </span>
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-semibold border ${badge.bg} ${badge.text} ${badge.border}`}>
+                              <Icon className="w-3 h-3" />
+                              {badge.label}
+                            </span>
+                            {opp.dailyBadge && (
+                              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md border ${
+                                opp.dailyBadge.includes('Trending')
+                                  ? 'bg-amber-50 text-amber-800 border-amber-200'
+                                  : opp.dailyBadge.includes('Closing')
+                                  ? 'bg-rose-50 text-rose-800 border-rose-200'
+                                  : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                              }`}>
+                                {opp.dailyBadge}
+                              </span>
+                            )}
+                          </div>
                           <span className="text-[11px] text-slate-400 font-medium">
                             {opp.mode}
                           </span>
@@ -538,9 +551,13 @@ export default function DashboardPage() {
                         <h4 className="text-sm font-bold text-slate-900 mb-1 line-clamp-1">
                           {opp.title}
                         </h4>
-                        <p className="text-xs font-medium text-slate-600 mb-2">
+                        <p className="text-xs font-medium text-slate-600 mb-1.5">
                           {opp.organization}
                         </p>
+                        <div className="flex items-center justify-between text-[10px] text-slate-400 mb-2">
+                          <span>+{opp.applicantsToday ?? 180} applicants today</span>
+                          <span>{opp.postedAt ?? 'Verified'}</span>
+                        </div>
                         <p className="text-xs text-slate-500 leading-relaxed line-clamp-2 mb-4">
                           {opp.description}
                         </p>

@@ -140,5 +140,13 @@ export interface Opportunity {
   destinations: string[] // matched destination IDs or ['all']
   tags: string[]
   featured?: boolean
+  trendingScore?: number
+  dailyBadge?: string
+  applicantsToday?: number
+  daysRemaining?: number
+  isNewToday?: boolean
+  isTrending?: boolean
+  isClosingSoon?: boolean
+  postedAt?: string
 }
 

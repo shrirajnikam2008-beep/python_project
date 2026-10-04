@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Waypoint — Complete Project, Codebase & Architecture Guide</title>
+<style>
+  @page {
+    size: A4;
+    margin: 16mm 14mm 16mm 14mm;
+  }
+  * {
+    box-sizing: border-box;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #1e293b;
+    background-color: #ffffff;
+    line-height: 1.55;
+    font-size: 13.5px;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Header / Cover Banner */
+  .cover {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #4f46e5 100%);
+    color: #ffffff;
+    padding: 32px 28px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 14px rgba(30, 58, 138, 0.15);
+  }
+  .cover-tag {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    margin-bottom: 12px;
+  }
+  .cover h1 {
+    margin: 0 0 8px 0;
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  .cover p {
+    margin: 0;
+    font-size: 14px;
+    opacity: 0.95;
+    max-width: 680px;
+    line-height: 1.5;
+  }
+  .cover-meta {
+    margin-top: 18px;
+    display: flex;
+    gap: 20px;
+    font-size: 11px;
+    opacity: 0.85;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    padding-top: 12px;
+  }
+  
+  h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 6px;
+    margin-top: 28px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  h3 {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: #1e3a8a;
+    margin-top: 18px;
+    margin-bottom: 8px;
+  }
+  p {
+    margin: 0 0 10px 0;
+  }
+  
+  /* Analogy Box */
+  .callout-analogy {
+    background-color: #f0fdf4;
+    border-left: 4px solid #16a34a;
+    padding: 14px 18px;
+    border-radius: 6px;
+    margin: 16px 0;
+  }
+  .callout-analogy h4 {
+    margin: 0 0 6px 0;
+    color: #15803d;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  .callout-info {
+    background-color: #eff6ff;
+    border-left: 4px solid #2563eb;
+    padding: 14px 18px;
+    border-radius: 6px;
+    margin: 16px 0;
+  }
+  .callout-info h4 {
+    margin: 0 0 6px 0;
+    color: #1d4ed8;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 20px 0;
+    font-size: 12px;
+    background: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+  }
+  th {
+    background-color: #f8fafc;
+    color: #334155;
+    text-align: left;
+    padding: 8px 12px;
+    font-weight: 600;
+    border-bottom: 1px solid #cbd5e1;
+  }
+  td {
+    padding: 7px 12px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: top;
+  }
+  tr:last-child td {
+    border-bottom: none;
+  }
+  tr:nth-child(even) td {
+    background-color: #fbfcfe;
+  }
+  
+  /* Badges */
+  .badge {
+    display: inline-block;
+    padding: 2px 7px;
+    font-size: 10.5px;
+    font-weight: 600;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+  .badge-blue { background: #dbeafe; color: #1e40af; }
+  .badge-green { background: #dcfce7; color: #166534; }
+  .badge-purple { background: #f3e8ff; color: #6b21a8; }
+  .badge-amber { background: #fef3c7; color: #92400e; }
+  
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 11.5px;
+    background-color: #f1f5f9;
+    padding: 1px 5px;
+    border-radius: 4px;
+    color: #0f172a;
+    border: 1px solid #e2e8f0;
+  }
+  
+  /* Grid Cards */
+  .card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 14px 0;
+  }
+  .card {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px 14px;
+    background-color: #ffffff;
+  }
+  .card-title {
+    font-weight: 700;
+    color: #0f172a;
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+  .card-desc {
+    font-size: 12px;
+    color: #475569;
+    line-height: 1.45;
+  }
+  
+  /* Diagram Box */
+  .diagram-container {
+    background-color: #0f172a;
+    color: #f8fafc;
+    border-radius: 8px;
+    padding: 16px;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 11px;
+    line-height: 1.5;
+    margin: 16px 0;
+    white-space: pre;
+    overflow-x: auto;
+  }
+  
+  .page-break {
+    page-break-before: always;
+  }
+  .no-break {
+    page-break-inside: avoid;
+  }
+  
+  .footer {
+    margin-top: 30px;
+    padding-top: 12px;
+    border-top: 1px solid #e2e8f0;
+    font-size: 11px;
+    color: #94a3b8;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+  <!-- COVER BANNER -->
+  <div class="cover">
+    <div class="cover-tag">Comprehensive Engineering Guide</div>
+    <h1>Waypoint: Codebase & Architecture Guide</h1>
+    <p>An in-depth, beginner-friendly walkthrough explaining every file, directory, technical dependency, and architectural concept powering the Waypoint academic & career navigation platform.</p>
+    <div class="cover-meta">
+      <span><strong>Stack:</strong> Next.js 14 + React Flow + FastAPI + Scikit-Learn</span>
+      <span><strong>Platform:</strong> Waypoint Academic & Career Navigator</span>
+      <span><strong>Audience:</strong> Beginner to Full-Stack Developer</span>
+    </div>
+  </div>
+
+  <!-- SECTION 1: THE BIG PICTURE -->
+  <div class="no-break">
+    <h2>1. The Big Picture: How Waypoint Works</h2>
+    <div class="callout-analogy">
+      <h4>The Restaurant Analogy (For Absolute Beginners)</h4>
+      <p>If Waypoint were a world-class restaurant:</p>
+      <ul>
+        <li><strong><code>frontend/</code> is the Dining Room:</strong> The beautiful menus, tables, lighting, and buttons that the customer sees, clicks, and touches.</li>
+        <li><strong><code>backend/</code> is the Kitchen:</strong> The chefs, ovens, and algorithms doing the heavy math, graph calculations, and AI logic behind closed doors.</li>
+        <li><strong><code>data/</code> is the Pantry:</strong> The raw ingredients (spreadsheets with skills, prerequisites, and job trends).</li>
+        <li><strong><code>tests/</code> is the Quality Inspector:</strong> Automated tests making sure recipes work without failing.</li>
+        <li><strong><code>docs/</code> is the Architectural Blueprint:</strong> Explaining the rules and design of the platform.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="no-break">
+    <h3>System Architecture Flow</h3>
+    <div class="diagram-container">
++-------------------------------------------------------------------------+
+|                       FRONTEND (Next.js 14 + React Flow)                 |
+|  - Interactive DAG Canvas (Custom Skill Nodes, Dependency Edges)        |
+|  - 4-Step Onboarding Wizard (Profile -> Academic -> Skills -> Goal)     |
+|  - Interactive Dashboard, Skill Gap Analyzer & Pathway Previews          |
++------------------------------------+------------------------------------+
+                                     |
+                                     | Typed API Layer (frontend/lib/api.ts)
+                                     v
++-------------------------------------------------------------------------+
+|                       BACKEND (FastAPI + Python 3.11)                   |
+|  - Graph Engine: Prerequisite Topological Sort (Route Builder)          |
+|  - Set-Theoretic Skill Gap Analyzer: Required \ Acquired                |
+|  - ML Layer: Unsupervised K-Means Journey Clustering (Crowd Trails)     |
+|  - Generative AI: Gemini API Contextual Rationale Generator             |
++------------------------------------+------------------------------------+
+                                     |
+                                     | CSV Ingestion & SQL Models
+                                     v
++-------------------------------------------------------------------------+
+|                              DATA LAYER                                 |
+|  - skills.csv  - prerequisites.csv  - student_trails.csv                |
+|  - market_signals.csv               - opportunities.csv                 |
++-------------------------------------------------------------------------+
+    </div>
+  </div>
+
+  <!-- SECTION 2: TECH STACK BREAKDOWN -->
+  <div class="page-break"></div>
+  <h2>2. Complete Technology Stack & Libraries</h2>
+  <p>Here are all the frameworks, libraries, and tools used to build Waypoint, and why each was chosen:</p>
+
+  <h3>Frontend Technologies</h3>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 25%;">Technology</th>
+        <th style="width: 20%;">Category</th>
+        <th>What It Does in Waypoint</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>Next.js 14 (App Router)</code></td>
+        <td><span class="badge badge-blue">Full-Stack Framework</span></td>
+        <td>Provides file-system routing (e.g. <code>app/dashboard</code>, <code>app/route/[id]</code>), server-side rendering, and performance optimizations.</td>
+      </tr>
+      <tr>
+        <td><code>React 18 & React-DOM</code></td>
+        <td><span class="badge badge-blue">UI Library</span></td>
+        <td>Powers modular components, state management (<code>useState</code>, <code>useEffect</code>), and custom hooks.</td>
+      </tr>
+      <tr>
+        <td><code>React Flow (reactflow)</code></td>
+        <td><span class="badge badge-purple">Graph Visualization</span></td>
+        <td>The core interactive roadmap canvas. Allows students to pan, zoom, inspect skill nodes, and trace prerequisite paths visually.</td>
+      </tr>
+      <tr>
+        <td><code>TypeScript</code></td>
+        <td><span class="badge badge-blue">Type Safety</span></td>
+        <td>Enforces strict data contracts for routes, skills, and student profiles, catching bugs before runtime.</td>
+      </tr>
+      <tr>
+        <td><code>Tailwind CSS</code></td>
+        <td><span class="badge badge-green">Styling</span></td>
+        <td>Utility-first CSS framework for clean, modern cards, buttons, badges, and responsive layouts without custom CSS bloat.</td>
+      </tr>
+      <tr>
+        <td><code>Framer Motion</code></td>
+        <td><span class="badge badge-purple">Animation</span></td>
+        <td>Handles smooth page transitions, sliding skill detail drawers, and interactive card hovering effects.</td>
+      </tr>
+      <tr>
+        <td><code>Lucide React</code></td>
+        <td><span class="badge badge-amber">Iconography</span></td>
+        <td>Clean, accessible iconography (compass, lock, checkmarks, trending arrows) used across navigation and roadmap nodes.</td>
+      </tr>
+      <tr>
+        <td><code>Recharts</code></td>
+        <td><span class="badge badge-purple">Data Visualization</span></td>
+        <td>Renders charts for skill gap distributions, market demand signals, and progress tracking.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Backend & Data Technologies</h3>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 25%;">Technology</th>
+        <th style="width: 20%;">Category</th>
+        <th>What It Does in Waypoint</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>FastAPI (Python 3.11)</code></td>
+        <td><span class="badge badge-blue">Backend Web Framework</span></td>
+        <td>Asynchronous Python REST API framework delivering lightning-fast endpoints for route calculations and skill audits.</td>
+      </tr>
+      <tr>
+        <td><code>Uvicorn</code></td>
+        <td><span class="badge badge-blue">ASGI Server</span></td>
+        <td>High-performance server hosting the FastAPI application.</td>
+      </tr>
+      <tr>
+        <td><code>Pydantic v2</code></td>
+        <td><span class="badge badge-green">Validation & Schemas</span></td>
+        <td>Validates incoming API payloads and serializes responses with strict type checking.</td>
+      </tr>
+      <tr>
+        <td><code>Pandas & NumPy</code></td>
+        <td><span class="badge badge-amber">Data Science</span></td>
+        <td>Loads, filters, and joins the CSV datasets (skills, prerequisites, historical student trails).</td>
+      </tr>
+      <tr>
+        <td><code>Scikit-learn</code></td>
+        <td><span class="badge badge-purple">Machine Learning</span></td>
+        <td>Provides K-Means clustering and vector similarity to cluster synthetic student journeys into "Crowd Trails".</td>
+      </tr>
+      <tr>
+        <td><code>Google Generative AI (Gemini)</code></td>
+        <td><span class="badge badge-purple">Generative AI</span></td>
+        <td>Turns deterministic mathematical graph outputs into natural, encouraging career advice and learning step rationales.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- SECTION 3: REPO FILES WALKTHROUGH -->
+  <div class="page-break"></div>
+  <h2>3. File-by-File & Folder-by-Folder Guide</h2>
+
+  <h3>A. Root Directory Files</h3>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 30%;">File / Directory</th>
+        <th>Plain-English Explanation</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>.devcontainer/devcontainer.json</code></td>
+        <td><strong>Cloud Dev Environment:</strong> Tells GitHub Codespaces or Docker to pre-install Python 3.11, Node 20, and all VS Code tools automatically.</td>
+      </tr>
+      <tr>
+        <td><code>requirements.txt</code></td>
+        <td><strong>Python Package List:</strong> Specifies all required backend dependencies (FastAPI, Scikit-learn, Pandas, Gemini SDK).</td>
+      </tr>
+      <tr>
+        <td><code>.env.example</code></td>
+        <td><strong>Secrets Template:</strong> Demonstrates required environment variables (e.g. <code>GEMINI_API_KEY</code>, <code>DATABASE_URL</code>) without exposing credentials.</td>
+      </tr>
+      <tr>
+        <td><code>.gitignore</code></td>
+        <td><strong>Exclusion List:</strong> Instructs Git to ignore build folders (<code>node_modules</code>, <code>.next</code>, <code>__pycache__</code>).</td>
+      </tr>
+      <tr>
+        <td><code>README.md</code></td>
+        <td><strong>Project Documentation:</strong> Welcome page, system overview, architecture diagram, and setup quickstart.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>B. <code>data/</code> Directory (The Curated Datasets)</h3>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 30%;">File</th>
+        <th>What It Contains & How It Is Used</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>skills.csv</code></td>
+        <td>List of skills (ID, name, category, difficulty) mapped to career tracks like AI/ML Engineer and Backend Developer.</td>
+      </tr>
+      <tr>
+        <td><code>prerequisites.csv</code></td>
+        <td><strong>The Dependency Graph:</strong> Directed pairs (e.g. <code>FastAPI -> Python</code>) with dependency strength ratings (0.0 to 1.0).</td>
+      </tr>
+      <tr>
+        <td><code>student_trails.csv</code></td>
+        <td>Historical student learning trajectories used by Machine Learning algorithms to find popular, successful learning paths.</td>
+      </tr>
+      <tr>
+        <td><code>market_signals.csv</code></td>
+        <td>Labor market indices (e.g., Python demand score 95, rising trend) used to recommend high-value skills.</td>
+      </tr>
+      <tr>
+        <td><code>opportunities.csv</code></td>
+        <td>Internships and scholarships tagged with prerequisite requirements, enabling personalized opportunity matching.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>C. <code>frontend/app/</code> Directory (The Web Pages)</h3>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 30%;">Page Path</th>
+        <th>What the User Sees & Experiences</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>app/layout.tsx</code></td>
+        <td><strong>Global Layout:</strong> Embeds the root HTML, Google Fonts, and wraps the app in the global <code>AuthProvider</code>.</td>
+      </tr>
+      <tr>
+        <td><code>app/page.tsx</code></td>
+        <td><strong>Landing Page (<code>/</code>):</strong> Welcome hero section, interactive route preview, feature showcases, and sign-up prompts.</td>
+      </tr>
+      <tr>
+        <td><code>app/onboarding/page.tsx</code></td>
+        <td><strong>Onboarding Wizard (<code>/onboarding</code>):</strong> Interactive 4-step questionnaire (Profile, Academic Background, Current Skills, Career Destination).</td>
+      </tr>
+      <tr>
+        <td><code>app/dashboard/page.tsx</code></td>
+        <td><strong>Student Dashboard (<code>/dashboard</code>):</strong> Central hub with circular progress rings, active milestones, next recommended skills, and route summaries.</td>
+      </tr>
+      <tr>
+        <td><code>app/routes/page.tsx</code></td>
+        <td><strong>Routes Directory (<code>/routes</code>):</strong> Displays alternative learning routes (Fast Track, Balanced, Foundation First) with duration and workload metrics.</td>
+      </tr>
+      <tr>
+        <td><code>app/route/[id]/page.tsx</code></td>
+        <td><strong>Interactive Route Map (<code>/route/balanced</code>):</strong> Fullscreen React Flow DAG roadmap where students pan, zoom, and inspect prerequisites.</td>
+      </tr>
+      <tr>
+        <td><code>app/skill-gaps/page.tsx</code></td>
+        <td><strong>Skill Gap Analysis (<code>/skill-gaps</code>):</strong> Categorized audit comparing current skills against career destination requirements.</td>
+      </tr>
+      <tr>
+        <td><code>app/login/</code> & <code>app/signup/</code></td>
+        <td><strong>Authentication Pages:</strong> Registration and login forms connected to localStorage/backend sessions.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- SECTION 4: DETAILED FRONTEND & BACKEND MECHANICS -->
+  <div class="page-break"></div>
+  <h2>4. Components & Backend Architecture In-Depth</h2>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-title">frontend/components/route-map/</div>
+      <div class="card-desc">
+        <strong>The Visual Graph Engine:</strong><br>
+        • <code>RouteMap.tsx</code>: Coordinates the React Flow canvas, minimap, zoom controls, and selected node state.<br>
+        • <code>SkillNode.tsx</code>: Custom node component rendering status badges (completed, current, locked) and connection handles.<br>
+        • <code>SkillDetailPanel.tsx</code>: Sliding flyout drawer showing skill description, estimated hours, and curated courses.<br>
+        • <code>MapLegend.tsx</code>: Floating helper explaining node colors and arrow styles.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">frontend/lib/ & contexts/</div>
+      <div class="card-desc">
+        <strong>Data Plumbing & State Management:</strong><br>
+        • <code>lib/api.ts</code>: The API abstraction layer. All screens fetch data here. Gracefully toggles between mock data and live FastAPI calls.<br>
+        • <code>lib/types.ts</code>: TypeScript interfaces for StudentProfile, Skill, Route, and GraphNode.<br>
+        • <code>lib/mock-data/</code>: Realistic sample data (routes, skills, catalog) allowing full offline prototyping.<br>
+        • <code>contexts/AuthContext.tsx</code>: Stores active user session state globally across all pages.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">backend/services/</div>
+      <div class="card-desc">
+        <strong>The Calculation Engines:</strong><br>
+        • <code>skill_gap.py</code>: Deterministic set comparison (Target Skills − Student Skills).<br>
+        • <code>route_builder.py</code>: Prerequisite graph traversal calculating optimal sequence orderings.<br>
+        • <code>rerouting.py</code>: Dynamic recalculation if a student changes destinations or finishes skills early.<br>
+        • <code>opportunity_matcher.py</code>: Matches eligible scholarships to student skill inventories.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">backend/ml/ & backend/ai/</div>
+      <div class="card-desc">
+        <strong>Machine Learning & Explainable AI:</strong><br>
+        • <code>ml/clustering.py</code>: Scikit-learn K-Means clustering identifying cohort patterns across student paths.<br>
+        • <code>ml/feature_builder.py</code>: Vectorizes sequential learning steps into numerical matrices.<br>
+        • <code>ai/explainer.py</code>: Google Gemini integration generating clear, human explanations for why a route was recommended.
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 5: CORE ENGINEERING CONCEPTS -->
+  <h2>5. Core Engineering Principles Explained</h2>
+
+  <div class="callout-info no-break">
+    <h4>1. Prerequisite Graph as a DAG (Directed Acyclic Graph)</h4>
+    <p>A skill roadmap is not a simple linear list. Because some skills can be learned in parallel while others have strict dependencies, Waypoint models learning paths as a <strong>Directed Acyclic Graph (DAG)</strong>:</p>
+    <ul>
+      <li><strong>Directed:</strong> Edges have arrows indicating dependency (e.g. <code>Python → Machine Learning</code>).</li>
+      <li><strong>Acyclic:</strong> There are no infinite circular dependencies (you cannot have A depend on B, B depend on C, and C depend on A).</li>
+      <li><strong>Topological Sorting:</strong> An algorithm that arranges skills in an order where all prerequisites are satisfied before subsequent skills begin.</li>
+    </ul>
+  </div>
+
+  <div class="callout-info no-break">
+    <h4>2. Deterministic Accuracy First, AI Explanations Second</h4>
+    <p>Many modern apps make the mistake of asking an LLM to "invent" a career roadmap, leading to hallucinations. Waypoint uses a hybrid design:</p>
+    <ul>
+      <li><strong>The Math is Deterministic:</strong> The skill gaps, prerequisite order, and timelines are calculated mathematically in Python using graph theory and set operations.</li>
+      <li><strong>The AI is an Explainer:</strong> The Gemini LLM is provided the <em>already-calculated results</em> and simply explains them in encouraging, easy-to-understand language.</li>
+    </ul>
+  </div>
+
+  <div class="no-break">
+    <h4>3. The API Abstraction Layer Pattern</h4>
+    <p>In <code>frontend/lib/api.ts</code>, the frontend UI never calls raw HTTP URLs directly. Instead, UI components call functions like <code>getRouteGraph(id)</code>. This separation means the frontend can run seamlessly with mock data during UI development, and later connect to live FastAPI endpoints without changing a single line of component code.</p>
+  </div>
+
+  <!-- SECTION 6: LEARNING ROADMAP -->
+  <div class="page-break"></div>
+  <h2>6. Recommended Learning Roadmap (How to Build This Yourself)</h2>
+  <p>If you want to master the skills needed to build platforms like Waypoint, follow this 4-phase learning progression:</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-title">Phase 1: Modern Web UI & TypeScript</div>
+      <div class="card-desc">
+        1. <strong>React Fundamentals:</strong> Components, props, <code>useState</code>, and <code>useEffect</code>.<br>
+        2. <strong>TypeScript:</strong> Type annotations, interfaces, and union types.<br>
+        3. <strong>Next.js 14 App Router:</strong> Server vs. client components, page routing, layouts.<br>
+        4. <strong>Tailwind CSS:</strong> Flexbox, CSS Grid, responsive design modifiers.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Phase 2: Graph Visualization</div>
+      <div class="card-desc">
+        1. <strong>React Flow:</strong> Canvas setup, node positioning, edge styling.<br>
+        2. <strong>Custom Nodes:</strong> Building custom node components with Handles.<br>
+        3. <strong>Stateful Graph Interactions:</strong> Click handlers, zoom controls, and flyout detail panels.<br>
+        4. <strong>Framer Motion:</strong> Smooth UI transitions and animated indicators.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Phase 3: Python Backend & APIs</div>
+      <div class="card-desc">
+        1. <strong>FastAPI:</strong> Creating endpoints (<code>GET</code>, <code>POST</code>), path/query parameters.<br>
+        2. <strong>Pydantic v2:</strong> Validating input/output data schemas.<br>
+        3. <strong>Pandas & CSVs:</strong> Filtering, merging, and querying tabular datasets.<br>
+        4. <strong>CORS & HTTP:</strong> Connecting frontend client requests to backend servers.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Phase 4: Algorithms, ML & Generative AI</div>
+      <div class="card-desc">
+        1. <strong>Graph Algorithms:</strong> Adjacency lists, DAGs, and Topological Sorting.<br>
+        2. <strong>Scikit-learn:</strong> Vectorization and K-Means clustering for trajectory analysis.<br>
+        3. <strong>Prompt Engineering:</strong> Feeding structured data into the Google Gemini API to produce explainable AI summaries.
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Waypoint Architecture & Codebase Guide • Generated for pair-programming and developer education.
+  </div>
+
+</body>
+</html>

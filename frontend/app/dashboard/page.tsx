@@ -9,6 +9,8 @@ import { Badge } from '@/components/ui/Badge'
 import { SkeletonCard } from '@/components/ui/SkeletonLoader'
 import { ErrorState } from '@/components/ui/ErrorState'
 import { getStudentProfile, getRoutes } from '@/lib/api'
+import { getDestinationById } from '@/lib/mock-data/destinations'
+import { getSkillsForDestination } from '@/lib/mock-data/skills'
 import { useAuth } from '@/contexts/AuthContext'
 import type { StudentProfile, Route } from '@/lib/types'
 import { getHour } from '@/lib/utils'
@@ -38,17 +40,6 @@ const fadeUp = {
   }),
 }
 
-const journeyNodes = [
-  { label: 'Python', status: 'done', category: 'Programming' },
-  { label: 'Git', status: 'done', category: 'Tools' },
-  { label: 'Data Structures', status: 'current', category: 'Foundations' },
-  { label: 'Linear Algebra', status: 'current', category: 'Mathematics' },
-  { label: 'Statistics', status: 'upcoming', category: 'Mathematics' },
-  { label: 'Data Analysis', status: 'upcoming', category: 'Data Science' },
-  { label: 'Machine Learning', status: 'upcoming', category: 'ML Core' },
-  { label: 'AI / ML Engineer', status: 'goal', category: 'Destination' },
-]
-
 export default function DashboardPage() {
   const [profile, setProfile] = useState<StudentProfile | null>(null)
   const [routes, setRoutes] = useState<Route[]>([])
@@ -66,10 +57,35 @@ export default function DashboardPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  const completedCount = profile?.currentSkills.length ?? 0
-  const totalSkills = 19
-  const remainingSkills = totalSkills - completedCount
-  const progress = Math.round((completedCount / totalSkills) * 100)
+  const targetDestination = getDestinationById(profile?.selectedDestinationId)
+  const destSkills = getSkillsForDestination(profile?.selectedDestinationId, profile?.currentSkills ?? [])
+
+  const completedSkillsList = destSkills.filter((s) => s.status === 'completed')
+  const completedCount = completedSkillsList.length
+  const totalSkills = destSkills.length || targetDestination.requiredSkillCount || 12
+  const remainingSkills = Math.max(0, totalSkills - completedCount)
+  const progress = Math.min(100, Math.round((completedCount / totalSkills) * 100))
+
+  const criticalGaps = destSkills.filter((s) => s.status !== 'completed' && s.priority === 'critical')
+  const highGaps = destSkills.filter((s) => s.status !== 'completed' && s.priority === 'high')
+  const recommendedGaps = destSkills.filter((s) => s.status !== 'completed' && s.priority === 'recommended')
+
+  // Recommended next immediate skill
+  const nextSkill = destSkills.find((s) => s.status === 'next') || destSkills.find((s) => s.status !== 'completed')
+
+  // Dynamic journey sequence nodes
+  const dynamicJourneyNodes = [
+    ...destSkills.slice(0, 7).map((s) => ({
+      label: s.name,
+      status: (s.status === 'completed' ? 'done' : s.status === 'next' ? 'current' : 'upcoming') as 'done' | 'current' | 'upcoming',
+      category: s.category,
+    })),
+    {
+      label: targetDestination.title,
+      status: 'goal' as const,
+      category: 'Destination',
+    },
+  ]
 
   // Dynamic subtitle based on what the student told us in onboarding
   const profileSubtitle = profile
@@ -110,7 +126,7 @@ export default function DashboardPage() {
                   {loading ? 'Welcome back' : `Welcome, ${displayName} 👋`}
                 </h1>
                 <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-                  Here is your real-time academic progression toward becoming an <strong>AI / ML Engineer</strong>.
+                  Here is your real-time academic progression toward becoming a <strong>{targetDestination.title}</strong>.
                 </p>
               </div>
 
@@ -161,10 +177,10 @@ export default function DashboardPage() {
                       <div>
                         <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
                           <MapPin className="w-5 h-5 text-blue-600 shrink-0" />
-                          AI / ML Engineer
+                          {targetDestination.title}
                         </h2>
                         <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-md">
-                          Build intelligent systems using data, linear algebra, statistics, and machine learning models.
+                          {targetDestination.description}
                         </p>
                       </div>
 
@@ -200,7 +216,7 @@ export default function DashboardPage() {
                     </div>
                     <div className="p-3 bg-blue-50/70 rounded-xl border border-blue-100">
                       <p className="text-xs text-blue-800 font-medium">Est. Timeline</p>
-                      <p className="text-lg font-bold text-blue-900 mt-0.5">16 weeks</p>
+                      <p className="text-lg font-bold text-blue-900 mt-0.5">{routes[0]?.totalWeeks ?? 16} weeks</p>
                     </div>
                   </div>
                 </div>
@@ -234,22 +250,22 @@ export default function DashboardPage() {
                       {[
                         {
                           label: 'Critical Gaps',
-                          count: 3,
-                          desc: 'DSA, Linear Algebra, Stats',
+                          count: criticalGaps.length,
+                          desc: criticalGaps.slice(0, 3).map((s) => s.name).join(', ') || 'All critical cleared',
                           badge: 'bg-red-50 text-red-700 border-red-200',
                           dot: 'bg-red-500',
                         },
                         {
                           label: 'High Priority',
-                          count: 4,
-                          desc: 'ML Core, SQL, Data Analysis',
+                          count: highGaps.length,
+                          desc: highGaps.slice(0, 3).map((s) => s.name).join(', ') || 'Core milestones clear',
                           badge: 'bg-amber-50 text-amber-700 border-amber-200',
                           dot: 'bg-amber-500',
                         },
                         {
                           label: 'Recommended',
-                          count: 4,
-                          desc: 'Deep Learning, NLP, MLOps',
+                          count: recommendedGaps.length,
+                          desc: recommendedGaps.slice(0, 3).map((s) => s.name).join(', ') || 'Electives & mock polish',
                           badge: 'bg-blue-50 text-blue-700 border-blue-200',
                           dot: 'bg-blue-500',
                         },
@@ -262,7 +278,7 @@ export default function DashboardPage() {
                             <span className={`w-2 h-2 rounded-full ${gap.dot}`} />
                             <div>
                               <p className="text-xs font-bold text-slate-900">{gap.label}</p>
-                              <p className="text-[10px] text-slate-500">{gap.desc}</p>
+                              <p className="text-[10px] text-slate-500 truncate max-w-[150px]">{gap.desc}</p>
                             </div>
                           </div>
                           <span className={`text-xs font-bold px-2 py-0.5 rounded-lg border ${gap.badge}`}>
@@ -283,6 +299,7 @@ export default function DashboardPage() {
               )}
             </motion.div>
           </div>
+
 
           {/* Horizontal Journey Sequence */}
           <motion.div custom={2} initial="hidden" animate="visible" variants={fadeUp}>
@@ -324,7 +341,7 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="flex items-center overflow-x-auto pb-3 pt-1">
-                  {journeyNodes.map((node, idx) => {
+                  {dynamicJourneyNodes.map((node, idx) => {
                     const isDone = node.status === 'done'
                     const isCurrent = node.status === 'current'
                     const isGoal = node.status === 'goal'
@@ -371,7 +388,7 @@ export default function DashboardPage() {
                           </div>
                         </div>
 
-                        {idx < journeyNodes.length - 1 && (
+                        {idx < dynamicJourneyNodes.length - 1 && (
                           <div
                             className={`mx-2 h-1 w-8 sm:w-12 shrink-0 mb-6 rounded-full ${
                               idx < 2
@@ -408,12 +425,19 @@ export default function DashboardPage() {
                     </div>
 
                     <h3 className="text-xl font-bold text-white mb-2">
-                      Start with: <u>Data Structures &amp; Algorithms</u>
+                      {nextSkill ? (
+                        <>Start with: <u>{nextSkill.name}</u></>
+                      ) : (
+                        <>All Foundation Steps Completed!</>
+                      )}
                     </h3>
                     <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                      Data Structures is the fundamental prerequisite unlocking <strong>Machine Learning implementations</strong> and <strong>SQL query optimization</strong>. Estimated effort: 3 weeks.
+                      {nextSkill
+                        ? `${nextSkill.whyItMatters} Estimated effort: ${nextSkill.estimatedWeeks || 3} weeks.`
+                        : `You have successfully completed all core prerequisites toward ${targetDestination.title}. You are ready for comprehensive mocks and direct capstone submissions.`}
                     </p>
                   </div>
+
 
                   <div className="shrink-0">
                     <Link

@@ -8,32 +8,35 @@ import { SkillCard } from '@/components/skill-gaps/SkillCard'
 import { SkeletonCard } from '@/components/ui/SkeletonLoader'
 import { ErrorState } from '@/components/ui/ErrorState'
 import { ProgressBar } from '@/components/ui/ProgressBar'
-import { getAllSkills, getStudentProfile } from '@/lib/api'
-import type { Skill, StudentProfile } from '@/lib/types'
+import { getStudentProfile } from '@/lib/api'
+import { getDestinationById } from '@/lib/mock-data/destinations'
+import { getSkillsForDestination } from '@/lib/mock-data/skills'
+import type { Skill, StudentProfile, Destination } from '@/lib/types'
 import { Filter, Sparkles, CheckCircle2, AlertCircle, AlertTriangle } from 'lucide-react'
 
 type FilterTab = 'all' | 'critical' | 'high' | 'recommended' | 'completed'
 
 export default function SkillGapsPage() {
-  const [skills, setSkills] = useState<Skill[]>([])
   const [profile, setProfile] = useState<StudentProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<FilterTab>('all')
 
   useEffect(() => {
-    Promise.all([getAllSkills(), getStudentProfile()])
-      .then(([s, p]) => {
-        setSkills(s)
+    getStudentProfile()
+      .then((p) => {
         setProfile(p)
       })
       .catch(() => setError('Failed to load skill gaps.'))
       .finally(() => setLoading(false))
   }, [])
 
+  const destination: Destination = getDestinationById(profile?.selectedDestinationId)
   const currentSkillIds = profile?.currentSkills ?? []
-  const currentSkills = skills.filter((s) => currentSkillIds.includes(s.id))
-  const gapSkills = skills.filter((s) => !currentSkillIds.includes(s.id))
+  const skills = getSkillsForDestination(profile?.selectedDestinationId, currentSkillIds)
+
+  const currentSkills = skills.filter((s) => s.status === 'completed')
+  const gapSkills = skills.filter((s) => s.status !== 'completed')
   const critical = gapSkills.filter((s) => s.priority === 'critical')
   const high = gapSkills.filter((s) => s.priority === 'high')
   const recommended = gapSkills.filter((s) => s.priority === 'recommended')
@@ -55,7 +58,7 @@ export default function SkillGapsPage() {
 
   return (
     <AuthGuard>
-    <AppShell title="Skill Gaps" breadcrumb={[{ label: 'Dashboard' }, { label: 'Skill Gaps' }]}>
+    <AppShell title="Skill Gaps" breadcrumb={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Skill Gaps' }]}>
       <div className="space-y-8">
         {/* Header Title Banner */}
         <motion.div
@@ -69,9 +72,12 @@ export default function SkillGapsPage() {
                 Your Skill Gaps
               </h1>
               <p className="text-sm text-slate-500 mt-0.5">
-                Skills standing between your current profile and your target destination: <strong>AI / ML Engineer</strong>.
+                Skills standing between your current profile and your target destination: <strong>{destination.title}</strong>.
               </p>
             </div>
+            <span className="text-xs font-semibold text-blue-700 bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-200 self-start sm:self-auto">
+              Destination: {destination.title}
+            </span>
           </div>
 
           {/* Overall Progress & Priority Stats Card */}
@@ -82,7 +88,7 @@ export default function SkillGapsPage() {
                   Overall Skill Acquisition Progress
                 </span>
                 <span className="text-sm font-extrabold text-blue-600">
-                  {completedCount} of {total} skills ({Math.round((completedCount / total) * 100)}%)
+                  {completedCount} of {total} skills ({total > 0 ? Math.round((completedCount / total) * 100) : 0}%)
                 </span>
               </div>
 
@@ -98,9 +104,12 @@ export default function SkillGapsPage() {
                   <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                   <div>
                     <p className="text-xs font-bold text-emerald-900">{completedCount} Acquired</p>
-                    <p className="text-[10px] text-emerald-700">Python, Git, etc.</p>
+                    <p className="text-[10px] text-emerald-700 truncate max-w-[120px]">
+                      {currentSkills.slice(0, 2).map((s) => s.name).join(', ') || 'None yet'}
+                    </p>
                   </div>
                 </div>
+
 
                 <div className="flex items-center gap-2.5 p-2 rounded-xl bg-red-50/70 border border-red-100">
                   <AlertCircle className="w-4 h-4 text-red-600" />

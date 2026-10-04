@@ -17,27 +17,53 @@ import {
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/contexts/AuthContext'
 
-const navItems = [
-  { href: '/dashboard', icon: LayoutDashboard, label: 'Overview', badge: null },
-  { href: '/onboarding', icon: UserCheck, label: 'Profile & Goal', badge: null },
-  { href: '/route/balanced', icon: Map, label: 'My Route', badge: 'Active' },
-  { href: '/skill-gaps', icon: BarChart3, label: 'Skill Gaps', badge: '11 gaps' },
-  { href: '/routes', icon: Route, label: 'Routes', badge: '3 paths' },
-]
+import { useEffect, useState } from 'react'
+import { getDestinationById } from '@/lib/mock-data/destinations'
+import { getSkillsForDestination } from '@/lib/mock-data/skills'
+import type { StudentProfile } from '@/lib/types'
 
 export function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void }) {
   const pathname = usePathname()
   const router = useRouter()
   const { user, logout } = useAuth()
 
+  const [destinationTitle, setDestinationTitle] = useState('AI / ML Engineer')
+  const [progress, setProgress] = useState(30)
+  const [gapCount, setGapCount] = useState(9)
+
+  useEffect(() => {
+    const raw = typeof window !== 'undefined' ? localStorage.getItem('waypoint_profile') : null
+    if (raw) {
+      try {
+        const p = JSON.parse(raw) as StudentProfile
+        const dest = getDestinationById(p.selectedDestinationId)
+        if (dest) setDestinationTitle(dest.title)
+
+        const skills = getSkillsForDestination(p.selectedDestinationId, p.currentSkills ?? [])
+        const total = skills.length || 1
+        const completed = skills.filter((s) => s.status === 'completed').length
+        setProgress(Math.round((completed / total) * 100))
+        setGapCount(Math.max(0, total - completed))
+      } catch {}
+    }
+  }, [pathname])
+
   const initials = user?.name
     ? user.name.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2)
-    : '?'
+    : 'ST'
 
   const handleLogout = async () => {
     await logout()
     router.push('/')
   }
+
+  const dynamicNavItems = [
+    { href: '/dashboard', icon: LayoutDashboard, label: 'Overview', badge: null },
+    { href: '/onboarding', icon: UserCheck, label: 'Profile & Goal', badge: null },
+    { href: '/route/balanced', icon: Map, label: 'My Route', badge: 'Active' },
+    { href: '/skill-gaps', icon: BarChart3, label: 'Skill Gaps', badge: `${gapCount} gaps` },
+    { href: '/routes', icon: Route, label: 'Routes', badge: '3 paths' },
+  ]
 
   return (
     <aside className="flex h-full w-64 flex-col bg-[#0B0F19] text-slate-300 border-r border-slate-800/80 select-none">
@@ -70,12 +96,15 @@ export function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void }) {
             <Compass className="w-3.5 h-3.5 text-blue-400 animate-spin-slow" /> Target Goal
           </span>
           <span className="text-emerald-400 font-semibold bg-emerald-500/10 px-1.5 py-0.5 rounded text-[10px] border border-emerald-500/20">
-            42%
+            {progress}%
           </span>
         </div>
-        <p className="text-xs font-semibold text-white truncate">AI / ML Engineer</p>
+        <p className="text-xs font-semibold text-white truncate" title={destinationTitle}>{destinationTitle}</p>
         <div className="w-full bg-slate-800 rounded-full h-1.5 mt-2 overflow-hidden">
-          <div className="bg-gradient-to-r from-blue-500 to-indigo-500 h-1.5 rounded-full w-[42%]" />
+          <div
+            className="bg-gradient-to-r from-blue-500 to-indigo-500 h-1.5 rounded-full transition-all duration-500"
+            style={{ width: `${Math.max(5, progress)}%` }}
+          />
         </div>
       </div>
 
@@ -84,7 +113,7 @@ export function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void }) {
         <div className="px-2 pb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
           Navigation
         </div>
-        {navItems.map((item) => {
+        {dynamicNavItems.map((item) => {
           const isActive =
             item.href === '/dashboard'
               ? pathname === '/dashboard'

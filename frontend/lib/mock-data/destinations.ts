@@ -129,3 +129,11 @@ export const mockDestinations: Destination[] = [
     ],
   },
 ]
+
+export const defaultDestination: Destination = mockDestinations[0]
+
+export const getDestinationById = (id?: string | null): Destination => {
+  if (!id) return defaultDestination
+  return mockDestinations.find((d) => d.id === id) ?? defaultDestination
+}
+

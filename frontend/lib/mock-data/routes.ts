@@ -1,4 +1,4 @@
-﻿import type { Route } from '@/lib/types'
+import type { Route } from '@/lib/types'
 import type { Node, Edge } from 'reactflow'
 import type { RouteNodeData } from '@/lib/types'
 
@@ -240,6 +240,228 @@ export const balancedRouteEdges: Edge[] = [
   { id: 'e-dl-goal', source: 'deep-learning', target: 'goal', type: 'smoothstep' },
   { id: 'e-mlops-goal', source: 'mlops', target: 'goal', type: 'smoothstep' },
 ]
+
+// ─── React Flow Graph Data for Fast Track Route (10 Weeks) ──────────────────
+export const fastTrackRouteNodes: Node<RouteNodeData>[] = [
+  {
+    id: 'start',
+    type: 'skillNode',
+    position: { x: 320, y: 20 },
+    data: { skillId: 'start', label: 'Start', category: 'Foundations', status: 'completed', priority: 'recommended', isStart: true },
+  },
+  {
+    id: 'python',
+    type: 'skillNode',
+    position: { x: 320, y: 100 },
+    data: { skillId: 'python', label: 'Python (Fast)', category: 'Programming', status: 'completed', priority: 'critical' },
+  },
+  {
+    id: 'data-structures',
+    type: 'skillNode',
+    position: { x: 180, y: 210 },
+    data: { skillId: 'data-structures', label: 'Data Structures', category: 'Foundations', status: 'next', priority: 'critical' },
+  },
+  {
+    id: 'linear-algebra',
+    type: 'skillNode',
+    position: { x: 460, y: 210 },
+    data: { skillId: 'linear-algebra', label: 'Linear Algebra', category: 'Mathematics', status: 'next', priority: 'critical' },
+  },
+  {
+    id: 'sql',
+    type: 'skillNode',
+    position: { x: 180, y: 320 },
+    data: { skillId: 'sql', label: 'SQL Essentials', category: 'Databases', status: 'locked', priority: 'high' },
+  },
+  {
+    id: 'statistics',
+    type: 'skillNode',
+    position: { x: 460, y: 320 },
+    data: { skillId: 'statistics', label: 'Applied Stats', category: 'Mathematics', status: 'locked', priority: 'critical' },
+  },
+  {
+    id: 'data-analysis',
+    type: 'skillNode',
+    position: { x: 320, y: 430 },
+    data: { skillId: 'data-analysis', label: 'Data Analysis', category: 'Data Science', status: 'locked', priority: 'high' },
+  },
+  {
+    id: 'machine-learning',
+    type: 'skillNode',
+    position: { x: 320, y: 540 },
+    data: { skillId: 'machine-learning', label: 'Machine Learning', category: 'Machine Learning', status: 'locked', priority: 'critical' },
+  },
+  {
+    id: 'deep-learning',
+    type: 'skillNode',
+    position: { x: 320, y: 650 },
+    data: { skillId: 'deep-learning', label: 'Deep Learning', category: 'Machine Learning', status: 'locked', priority: 'high' },
+  },
+  {
+    id: 'goal',
+    type: 'skillNode',
+    position: { x: 320, y: 760 },
+    data: { skillId: 'goal', label: 'AI / ML Engineer', category: 'Machine Learning', status: 'locked', priority: 'critical', isGoal: true },
+  },
+]
+
+export const fastTrackRouteEdges: Edge[] = [
+  { id: 'ft-start-python', source: 'start', target: 'python', type: 'smoothstep' },
+  { id: 'ft-py-ds', source: 'python', target: 'data-structures', type: 'smoothstep' },
+  { id: 'ft-py-la', source: 'python', target: 'linear-algebra', type: 'smoothstep' },
+  { id: 'ft-ds-sql', source: 'data-structures', target: 'sql', type: 'smoothstep' },
+  { id: 'ft-la-stats', source: 'linear-algebra', target: 'statistics', type: 'smoothstep' },
+  { id: 'ft-sql-da', source: 'sql', target: 'data-analysis', type: 'smoothstep' },
+  { id: 'ft-stats-da', source: 'statistics', target: 'data-analysis', type: 'smoothstep' },
+  { id: 'ft-da-ml', source: 'data-analysis', target: 'machine-learning', type: 'smoothstep' },
+  { id: 'ft-stats-ml', source: 'statistics', target: 'machine-learning', type: 'smoothstep' },
+  { id: 'ft-ml-dl', source: 'machine-learning', target: 'deep-learning', type: 'smoothstep' },
+  { id: 'ft-dl-goal', source: 'deep-learning', target: 'goal', type: 'smoothstep' },
+]
+
+// ─── React Flow Graph Data for Foundation First Route (20 Weeks) ─────────────
+export const foundationRouteNodes: Node<RouteNodeData>[] = [
+  {
+    id: 'start',
+    type: 'skillNode',
+    position: { x: 360, y: 20 },
+    data: { skillId: 'start', label: 'Start', category: 'Foundations', status: 'completed', priority: 'recommended', isStart: true },
+  },
+  {
+    id: 'python',
+    type: 'skillNode',
+    position: { x: 200, y: 100 },
+    data: { skillId: 'python', label: 'Python Mastery', category: 'Programming', status: 'completed', priority: 'critical' },
+  },
+  {
+    id: 'git',
+    type: 'skillNode',
+    position: { x: 520, y: 100 },
+    data: { skillId: 'git', label: 'Git & Linux', category: 'Tools', status: 'completed', priority: 'recommended' },
+  },
+  {
+    id: 'data-structures',
+    type: 'skillNode',
+    position: { x: 120, y: 210 },
+    data: { skillId: 'data-structures', label: 'Data Structures', category: 'Foundations', status: 'next', priority: 'critical' },
+  },
+  {
+    id: 'linear-algebra',
+    type: 'skillNode',
+    position: { x: 360, y: 210 },
+    data: { skillId: 'linear-algebra', label: 'Linear Algebra', category: 'Mathematics', status: 'next', priority: 'critical' },
+  },
+  {
+    id: 'cloud-basics',
+    type: 'skillNode',
+    position: { x: 600, y: 210 },
+    data: { skillId: 'cloud-basics', label: 'Cloud Basics', category: 'Tools', status: 'locked', priority: 'recommended' },
+  },
+  {
+    id: 'sql',
+    type: 'skillNode',
+    position: { x: 120, y: 320 },
+    data: { skillId: 'sql', label: 'Advanced SQL & DBs', category: 'Databases', status: 'locked', priority: 'high' },
+  },
+  {
+    id: 'statistics',
+    type: 'skillNode',
+    position: { x: 360, y: 320 },
+    data: { skillId: 'statistics', label: 'Rigorous Stats', category: 'Mathematics', status: 'locked', priority: 'critical' },
+  },
+  {
+    id: 'data-analysis',
+    type: 'skillNode',
+    position: { x: 240, y: 430 },
+    data: { skillId: 'data-analysis', label: 'Data Analysis & EDA', category: 'Data Science', status: 'locked', priority: 'high' },
+  },
+  {
+    id: 'mlops',
+    type: 'skillNode',
+    position: { x: 500, y: 430 },
+    data: { skillId: 'mlops', label: 'MLOps Pipeline', category: 'Tools', status: 'locked', priority: 'recommended' },
+  },
+  {
+    id: 'machine-learning',
+    type: 'skillNode',
+    position: { x: 240, y: 540 },
+    data: { skillId: 'machine-learning', label: 'Machine Learning', category: 'Machine Learning', status: 'locked', priority: 'critical' },
+  },
+  {
+    id: 'deep-learning',
+    type: 'skillNode',
+    position: { x: 240, y: 650 },
+    data: { skillId: 'deep-learning', label: 'Deep Learning', category: 'Machine Learning', status: 'locked', priority: 'high' },
+  },
+  {
+    id: 'nlp',
+    type: 'skillNode',
+    position: { x: 480, y: 650 },
+    data: { skillId: 'nlp', label: 'NLP & Transformers', category: 'Machine Learning', status: 'locked', priority: 'recommended' },
+  },
+  {
+    id: 'goal',
+    type: 'skillNode',
+    position: { x: 360, y: 770 },
+    data: { skillId: 'goal', label: 'AI / ML Engineer', category: 'Machine Learning', status: 'locked', priority: 'critical', isGoal: true },
+  },
+]
+
+export const foundationRouteEdges: Edge[] = [
+  { id: 'fn-start-py', source: 'start', target: 'python', type: 'smoothstep' },
+  { id: 'fn-start-git', source: 'start', target: 'git', type: 'smoothstep' },
+  { id: 'fn-py-ds', source: 'python', target: 'data-structures', type: 'smoothstep' },
+  { id: 'fn-py-la', source: 'python', target: 'linear-algebra', type: 'smoothstep' },
+  { id: 'fn-git-cloud', source: 'git', target: 'cloud-basics', type: 'smoothstep' },
+  { id: 'fn-ds-sql', source: 'data-structures', target: 'sql', type: 'smoothstep' },
+  { id: 'fn-la-stats', source: 'linear-algebra', target: 'statistics', type: 'smoothstep' },
+  { id: 'fn-sql-da', source: 'sql', target: 'data-analysis', type: 'smoothstep' },
+  { id: 'fn-stats-da', source: 'statistics', target: 'data-analysis', type: 'smoothstep' },
+  { id: 'fn-cloud-mlops', source: 'cloud-basics', target: 'mlops', type: 'smoothstep' },
+  { id: 'fn-da-ml', source: 'data-analysis', target: 'machine-learning', type: 'smoothstep' },
+  { id: 'fn-stats-ml', source: 'statistics', target: 'machine-learning', type: 'smoothstep' },
+  { id: 'fn-ml-dl', source: 'machine-learning', target: 'deep-learning', type: 'smoothstep' },
+  { id: 'fn-ml-mlops', source: 'machine-learning', target: 'mlops', type: 'smoothstep' },
+  { id: 'fn-dl-nlp', source: 'deep-learning', target: 'nlp', type: 'smoothstep' },
+  { id: 'fn-dl-goal', source: 'deep-learning', target: 'goal', type: 'smoothstep' },
+  { id: 'fn-nlp-goal', source: 'nlp', target: 'goal', type: 'smoothstep' },
+  { id: 'fn-mlops-goal', source: 'mlops', target: 'goal', type: 'smoothstep' },
+]
+
+export function getRouteGraphData(
+  routeId: string,
+  destinationTitle?: string
+): { nodes: Node<RouteNodeData>[]; edges: Edge[] } {
+  let baseNodes: Node<RouteNodeData>[]
+  let baseEdges: Edge[]
+
+  if (routeId === 'fast-track') {
+    baseNodes = fastTrackRouteNodes
+    baseEdges = fastTrackRouteEdges
+  } else if (routeId === 'foundation-first') {
+    baseNodes = foundationRouteNodes
+    baseEdges = foundationRouteEdges
+  } else {
+    baseNodes = balancedRouteNodes
+    baseEdges = balancedRouteEdges
+  }
+
+  // Clone nodes to update goal label dynamically if destinationTitle is provided
+  const nodes = baseNodes.map((n) => {
+    if (n.data?.isGoal && destinationTitle) {
+      return {
+        ...n,
+        data: {
+          ...n.data,
+          label: destinationTitle,
+        },
+      }
+    }
+    return n
+  })
+
+  return { nodes, edges: baseEdges }
+}
 
 export const getRouteById = (id: string): Route | undefined =>
   mockRoutes.find((r) => r.id === id)

@@ -8,9 +8,9 @@
 
 import type { StudentProfile, Skill, Route, Destination } from '@/lib/types'
 import { mockStudent } from '@/lib/mock-data/student'
-import { mockSkills, getSkillById as _getSkillById } from '@/lib/mock-data/skills'
-import { mockRoutes, getRouteById as _getRouteById, balancedRouteNodes, balancedRouteEdges } from '@/lib/mock-data/routes'
-import { mockDestinations } from '@/lib/mock-data/destinations'
+import { mockSkills, getSkillById as _getSkillById, getSkillsForDestination } from '@/lib/mock-data/skills'
+import { mockRoutes, getRouteById as _getRouteById, getRouteGraphData } from '@/lib/mock-data/routes'
+import { mockDestinations, getDestinationById } from '@/lib/mock-data/destinations'
 import type { Node, Edge } from 'reactflow'
 import type { RouteNodeData } from '@/lib/types'
 
@@ -38,8 +38,14 @@ export async function createStudentProfile(profile: StudentProfile): Promise<Stu
 
 // ─── Skills ──────────────────────────────────────────────────────────────────
 
-export async function getAllSkills(): Promise<Skill[]> {
+export async function getAllSkills(
+  destinationId?: string,
+  currentSkillIds?: string[]
+): Promise<Skill[]> {
   await delay(300)
+  if (destinationId) {
+    return getSkillsForDestination(destinationId, currentSkillIds ?? [])
+  }
   return mockSkills
 }
 
@@ -48,9 +54,15 @@ export async function getSkillById(id: string): Promise<Skill | null> {
   return _getSkillById(id) ?? null
 }
 
-export async function getSkillGaps(currentSkillIds: string[]): Promise<Skill[]> {
+export async function getSkillGaps(
+  currentSkillIds: string[],
+  destinationId?: string
+): Promise<Skill[]> {
   await delay(400)
-  return mockSkills.filter((s) => !currentSkillIds.includes(s.id))
+  const skills = destinationId
+    ? getSkillsForDestination(destinationId, currentSkillIds)
+    : mockSkills
+  return skills.filter((s) => !currentSkillIds.includes(s.id) && s.status !== 'completed')
 }
 
 // ─── Destinations ─────────────────────────────────────────────────────────────
@@ -58,6 +70,11 @@ export async function getSkillGaps(currentSkillIds: string[]): Promise<Skill[]> 
 export async function getDestinations(): Promise<Destination[]> {
   await delay(300)
   return mockDestinations
+}
+
+export async function getDestination(id?: string): Promise<Destination> {
+  await delay(200)
+  return getDestinationById(id)
 }
 
 // ─── Routes ──────────────────────────────────────────────────────────────────
@@ -74,19 +91,18 @@ export async function getRoute(routeId: string): Promise<Route | null> {
 
 // ─── Route Map Graph ─────────────────────────────────────────────────────────
 
-export async function getRouteGraph(routeId: string): Promise<{
+export async function getRouteGraph(
+  routeId: string,
+  destinationTitle?: string
+): Promise<{
   nodes: Node<RouteNodeData>[]
   edges: Edge[]
 } | null> {
-  await delay(500)
-  // For R2, return the balanced route graph for all routes
-  // In production: fetch route-specific graph from backend
+  await delay(400)
   if (!_getRouteById(routeId)) return null
-  return {
-    nodes: balancedRouteNodes,
-    edges: balancedRouteEdges,
-  }
+  return getRouteGraphData(routeId, destinationTitle)
 }
+
 
 // ─── Auth (Mock — backed by localStorage) ─────────────────────────────────
 // When FastAPI backend is ready: replace these with fetch('/api/auth/...') calls.

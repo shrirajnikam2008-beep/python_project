@@ -19,7 +19,8 @@ import { SkillDetailPanel } from './SkillDetailPanel'
 import { MapLegend } from './MapLegend'
 import { SkeletonCard } from '@/components/ui/SkeletonLoader'
 import { ErrorState } from '@/components/ui/ErrorState'
-import { getRouteGraph, getRoutes } from '@/lib/api'
+import { getRouteGraph, getRoutes, getStudentProfile } from '@/lib/api'
+import { getDestinationById } from '@/lib/mock-data/destinations'
 import { getSkillById } from '@/lib/mock-data/skills'
 import type { Skill, Route, RouteNodeData } from '@/lib/types'
 import {
@@ -48,6 +49,7 @@ function RouteMapInner({ routeId }: { routeId: string }) {
   const [nodes, setNodes, onNodesChange] = useNodesState([])
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
   const [routes, setRoutes] = useState<Route[]>([])
+  const [destinationTitle, setDestinationTitle] = useState('AI / ML Engineer')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null)
@@ -56,7 +58,12 @@ function RouteMapInner({ routeId }: { routeId: string }) {
   useEffect(() => {
     setLoading(true)
     setError(null)
-    Promise.all([getRouteGraph(routeId), getRoutes()])
+    getStudentProfile()
+      .then((p) => {
+        const dest = getDestinationById(p?.selectedDestinationId)
+        setDestinationTitle(dest.title)
+        return Promise.all([getRouteGraph(routeId, dest.title), getRoutes()])
+      })
       .then(([graph, allRoutes]) => {
         if (!graph) {
           setError('Route not found.')
@@ -83,15 +90,16 @@ function RouteMapInner({ routeId }: { routeId: string }) {
 
   const currentRoute = routes.find((r) => r.id === routeId) || {
     id: routeId,
-    name: 'Balanced Route',
-    totalWeeks: 16,
-    skillCount: 12,
-    workload: 'Medium',
+    name: routeId === 'fast-track' ? 'Fast Track' : routeId === 'foundation-first' ? 'Foundation First' : 'Balanced Route',
+    totalWeeks: routeId === 'fast-track' ? 10 : routeId === 'foundation-first' ? 20 : 16,
+    skillCount: routeId === 'fast-track' ? 10 : routeId === 'foundation-first' ? 14 : 12,
+    workload: (routeId === 'fast-track' ? 'High' : routeId === 'foundation-first' ? 'Low' : 'Medium') as Route['workload'],
   }
 
   const handleCenterOnNext = () => {
     reactFlowInstance.setCenter(100, 220, { zoom: 1.2, duration: 600 })
   }
+
 
   const handleResetView = () => {
     reactFlowInstance.fitView({ padding: 0.15, duration: 600 })
@@ -140,10 +148,10 @@ function RouteMapInner({ routeId }: { routeId: string }) {
             <div className="flex items-center gap-1.5">
               <span className="text-xs font-bold text-slate-900">{currentRoute.name}</span>
               <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
-                16w • 12 skills
+                {currentRoute.totalWeeks}w • {currentRoute.skillCount} skills
               </span>
             </div>
-            <p className="text-[10px] text-slate-400">Target: AI / ML Engineer</p>
+            <p className="text-[10px] text-slate-400">Target: {destinationTitle}</p>
           </div>
         </div>
 

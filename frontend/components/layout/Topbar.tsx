@@ -1,7 +1,10 @@
 'use client'
 
-import { Bell, Menu, Compass, ArrowUpRight, Sparkles } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Bell, Menu, ArrowUpRight } from 'lucide-react'
 import Link from 'next/link'
+import { useAuth } from '@/contexts/AuthContext'
+import { getDestinationById } from '@/lib/mock-data/destinations'
 
 interface TopbarProps {
   title: string
@@ -10,6 +13,32 @@ interface TopbarProps {
 }
 
 export function Topbar({ title, breadcrumb, onOpenMobileNav }: TopbarProps) {
+  const { user } = useAuth()
+  const [destinationTitle, setDestinationTitle] = useState<string>('AI / ML Engineer')
+
+  useEffect(() => {
+    const raw = typeof window !== 'undefined' ? localStorage.getItem('waypoint_profile') : null
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw)
+        if (parsed.selectedDestinationId) {
+          const dest = getDestinationById(parsed.selectedDestinationId)
+          if (dest) setDestinationTitle(dest.title)
+        }
+      } catch {}
+    }
+  }, [])
+
+  const initials = user?.name
+    ? user.name
+        .trim()
+        .split(/\s+/)
+        .map((w) => w[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2)
+    : 'ST'
+
   return (
     <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-200/80 bg-white/85 px-4 sm:px-6 backdrop-blur-md">
       <div className="flex items-center gap-3">
@@ -57,7 +86,7 @@ export function Topbar({ title, breadcrumb, onOpenMobileNav }: TopbarProps) {
           className="hidden sm:inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/70 px-3 py-1 text-xs font-medium text-blue-700 hover:bg-blue-100/80 transition-colors shadow-xs"
         >
           <span className="flex h-1.5 w-1.5 rounded-full bg-blue-600 animate-pulse" />
-          <span>Destination: <strong>AI / ML Engineer</strong></span>
+          <span>Destination: <strong>{destinationTitle}</strong></span>
           <ArrowUpRight className="h-3 w-3 text-blue-500" />
         </Link>
 
@@ -73,11 +102,12 @@ export function Topbar({ title, breadcrumb, onOpenMobileNav }: TopbarProps) {
 
         {/* Student Avatar */}
         <div className="flex items-center gap-2 pl-1 sm:pl-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-slate-900 to-slate-800 text-xs font-bold text-white shadow-xs">
-            AS
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-slate-900 to-slate-800 text-xs font-bold text-white shadow-xs" title={user?.name ?? 'Student'}>
+            {initials}
           </div>
         </div>
       </div>
     </header>
   )
 }
+

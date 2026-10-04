@@ -121,3 +121,24 @@ export interface ApiResponse<T> {
   error: string | null
   loading: boolean
 }
+
+// ─── Opportunities & Ecosystem ──────────────────────────────────────────────
+export type OpportunityType = 'Hackathon' | 'Internship' | 'Research' | 'Incubator' | 'Competition'
+
+export interface Opportunity {
+  id: string
+  title: string
+  organization: string
+  type: OpportunityType
+  description: string
+  deadline: string
+  stipendOrPrize?: string
+  location: string
+  eligibility: string
+  url: string
+  mode: 'Online' | 'In-person' | 'Hybrid'
+  destinations: string[] // matched destination IDs or ['all']
+  tags: string[]
+  featured?: boolean
+}
+

@@ -62,7 +62,10 @@ function RouteMapInner({ routeId }: { routeId: string }) {
       .then((p) => {
         const dest = getDestinationById(p?.selectedDestinationId)
         setDestinationTitle(dest.title)
-        return Promise.all([getRouteGraph(routeId, dest.title), getRoutes()])
+        return Promise.all([
+          getRouteGraph(routeId, p?.selectedDestinationId, dest.title, p?.currentSkills ?? []),
+          getRoutes(),
+        ])
       })
       .then(([graph, allRoutes]) => {
         if (!graph) {

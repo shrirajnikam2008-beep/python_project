@@ -13,6 +13,7 @@ import {
   GraduationCap,
   LogOut,
   UserCheck,
+  Sparkles,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/contexts/AuthContext'
@@ -63,6 +64,7 @@ export function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void }) {
     { href: '/route/balanced', icon: Map, label: 'My Route', badge: 'Active' },
     { href: '/skill-gaps', icon: BarChart3, label: 'Skill Gaps', badge: `${gapCount} gaps` },
     { href: '/routes', icon: Route, label: 'Routes', badge: '3 paths' },
+    { href: '/opportunities', icon: Sparkles, label: 'Opportunities', badge: '12 live' },
   ]
 
   return (

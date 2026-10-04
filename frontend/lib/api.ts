@@ -6,13 +6,15 @@
  * The function signatures remain stable — the UI will not need changes.
  */
 
-import type { StudentProfile, Skill, Route, Destination } from '@/lib/types'
+import type { StudentProfile, Skill, Route, Destination, Opportunity, OpportunityType } from '@/lib/types'
 import { mockStudent } from '@/lib/mock-data/student'
 import { mockSkills, getSkillById as _getSkillById, getSkillsForDestination } from '@/lib/mock-data/skills'
 import { mockRoutes, getRouteById as _getRouteById, getRouteGraphData } from '@/lib/mock-data/routes'
 import { mockDestinations, getDestinationById } from '@/lib/mock-data/destinations'
+import { mockOpportunities, getOpportunities as _getOpportunities } from '@/lib/mock-data/opportunities'
 import type { Node, Edge } from 'reactflow'
 import type { RouteNodeData } from '@/lib/types'
+
 
 // Simulate network delay for realistic loading states
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms))
@@ -93,15 +95,29 @@ export async function getRoute(routeId: string): Promise<Route | null> {
 
 export async function getRouteGraph(
   routeId: string,
-  destinationTitle?: string
+  destinationId?: string,
+  destinationTitle?: string,
+  currentSkillIds: string[] = []
 ): Promise<{
   nodes: Node<RouteNodeData>[]
   edges: Edge[]
 } | null> {
-  await delay(400)
+  await delay(300)
   if (!_getRouteById(routeId)) return null
-  return getRouteGraphData(routeId, destinationTitle)
+  return getRouteGraphData(routeId, destinationId, destinationTitle, currentSkillIds)
 }
+
+// ─── Opportunities & Action Ecosystem ────────────────────────────────────────
+
+export async function getOpportunities(
+  destinationId?: string,
+  type?: OpportunityType | 'all'
+): Promise<Opportunity[]> {
+  await delay(300)
+  return _getOpportunities(destinationId, type)
+}
+
+
 
 
 // ─── Auth (Mock — backed by localStorage) ─────────────────────────────────

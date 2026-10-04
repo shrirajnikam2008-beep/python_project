@@ -8,11 +8,11 @@ import { ProgressRing } from '@/components/ui/ProgressRing'
 import { Badge } from '@/components/ui/Badge'
 import { SkeletonCard } from '@/components/ui/SkeletonLoader'
 import { ErrorState } from '@/components/ui/ErrorState'
-import { getStudentProfile, getRoutes } from '@/lib/api'
+import { getStudentProfile, getRoutes, getOpportunities } from '@/lib/api'
 import { getDestinationById } from '@/lib/mock-data/destinations'
 import { getSkillsForDestination } from '@/lib/mock-data/skills'
 import { useAuth } from '@/contexts/AuthContext'
-import type { StudentProfile, Route } from '@/lib/types'
+import type { StudentProfile, Route, Opportunity, OpportunityType } from '@/lib/types'
 import { getHour } from '@/lib/utils'
 import Link from 'next/link'
 import {
@@ -29,6 +29,11 @@ import {
   Sparkles,
   ChevronRight,
   TrendingUp,
+  ExternalLink,
+  Trophy,
+  Briefcase,
+  Microscope,
+  Rocket,
 } from 'lucide-react'
 
 const fadeUp = {
@@ -40,18 +45,40 @@ const fadeUp = {
   }),
 }
 
+const typeIcons: Record<OpportunityType, React.ElementType> = {
+  Hackathon: Trophy,
+  Internship: Briefcase,
+  Research: Microscope,
+  Incubator: Rocket,
+  Competition: Trophy,
+}
+
+const typeBadges: Record<OpportunityType, { label: string; bg: string; text: string; border: string }> = {
+  Hackathon: { label: 'Hackathon', bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200' },
+  Internship: { label: 'Internship', bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
+  Research: { label: 'Research', bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200' },
+  Incubator: { label: 'Incubator & Startup', bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200' },
+  Competition: { label: 'Competition', bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
+}
+
 export default function DashboardPage() {
   const [profile, setProfile] = useState<StudentProfile | null>(null)
   const [routes, setRoutes] = useState<Route[]>([])
+  const [opportunities, setOpportunities] = useState<Opportunity[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { user } = useAuth()
 
   useEffect(() => {
-    Promise.all([getStudentProfile(), getRoutes()])
-      .then(([p, r]) => {
+    Promise.all([getStudentProfile(), getRoutes(), getOpportunities()])
+      .then(([p, r, opps]) => {
         setProfile(p)
         setRoutes(r)
+        const destId = p?.selectedDestinationId
+        const filtered = opps.filter(
+          (o) => !destId || o.destinations.includes('all') || o.destinations.includes(destId)
+        )
+        setOpportunities(filtered.slice(0, 3))
       })
       .catch(() => setError('Failed to load your dashboard.'))
       .finally(() => setLoading(false))
@@ -452,8 +479,96 @@ export default function DashboardPage() {
             )}
           </motion.div>
 
-          {/* Available Routes Preview Row */}
+          {/* Authentic Opportunities & Action Radar */}
           <motion.div custom={4} initial="hidden" animate="visible" variants={fadeUp}>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-base font-bold text-slate-900">Opportunities Radar</h2>
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                    <Sparkles className="w-3 h-3 text-amber-600" /> Authentic Programs
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500">
+                  Real hackathons, research fellowships, internships & startup incubators aligned to <strong>{targetDestination.title}</strong>
+                </p>
+              </div>
+              <Link
+                href="/opportunities"
+                className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1 group shrink-0"
+              >
+                Explore all 12 live programs <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            </div>
+
+            {loading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {[0, 1, 2].map((i) => (
+                  <SkeletonCard key={i} />
+                ))}
+              </div>
+            ) : opportunities.length === 0 ? (
+              <div className="bg-white border border-slate-200/90 rounded-2xl p-6 text-center text-slate-500 text-sm">
+                No active opportunities found for this destination right now.{' '}
+                <Link href="/opportunities" className="text-blue-600 font-semibold underline">
+                  Browse all 12 authentic opportunities
+                </Link>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                {opportunities.map((opp) => {
+                  const badge = typeBadges[opp.type] || typeBadges.Competition
+                  const Icon = typeIcons[opp.type] || Trophy
+                  return (
+                    <div
+                      key={opp.id}
+                      className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm hover:shadow-md hover:border-blue-300 transition-all flex flex-col justify-between"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between mb-3">
+                          <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-semibold border ${badge.bg} ${badge.text} ${badge.border}`}>
+                            <Icon className="w-3 h-3" />
+                            {badge.label}
+                          </span>
+                          <span className="text-[11px] text-slate-400 font-medium">
+                            {opp.mode}
+                          </span>
+                        </div>
+
+                        <h4 className="text-sm font-bold text-slate-900 mb-1 line-clamp-1">
+                          {opp.title}
+                        </h4>
+                        <p className="text-xs font-medium text-slate-600 mb-2">
+                          {opp.organization}
+                        </p>
+                        <p className="text-xs text-slate-500 leading-relaxed line-clamp-2 mb-4">
+                          {opp.description}
+                        </p>
+                      </div>
+
+                      <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                        <div className="text-[11px]">
+                          <span className="text-slate-400 block text-[10px]">Stipend / Prize</span>
+                          <span className="font-bold text-slate-800">{opp.stipendOrPrize || 'Free Participation'}</span>
+                        </div>
+                        <a
+                          href={opp.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors"
+                        >
+                          Apply <ExternalLink className="w-3 h-3" />
+                        </a>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </motion.div>
+
+          {/* Available Routes Preview Row */}
+          <motion.div custom={5} initial="hidden" animate="visible" variants={fadeUp}>
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h2 className="text-base font-bold text-slate-900">Alternative Learning Routes</h2>

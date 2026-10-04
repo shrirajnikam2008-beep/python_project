@@ -1,6 +1,7 @@
 import type { Route } from '@/lib/types'
 import type { Node, Edge } from 'reactflow'
 import type { RouteNodeData } from '@/lib/types'
+import { getSkillsForDestination } from '@/lib/mock-data/skills'
 
 export const mockRoutes: Route[] = [
   {
@@ -428,10 +429,177 @@ export const foundationRouteEdges: Edge[] = [
   { id: 'fn-mlops-goal', source: 'mlops', target: 'goal', type: 'smoothstep' },
 ]
 
+export function generateDestinationGraph(
+  destinationId: string,
+  routeId: string,
+  destinationTitle: string,
+  currentSkillIds: string[] = []
+): { nodes: Node<RouteNodeData>[]; edges: Edge[] } {
+  let skills = getSkillsForDestination(destinationId, currentSkillIds)
+
+  if (routeId === 'fast-track') {
+    const core = skills.filter((s) => s.priority === 'critical' || s.priority === 'high')
+    skills = core.length >= 6 ? core : skills
+  }
+
+  const skillIds = new Set(skills.map((s) => s.id))
+
+  // Compute topological depth for each skill
+  const depthMap: Record<string, number> = {}
+  function getDepth(id: string, visited = new Set<string>()): number {
+    if (depthMap[id] !== undefined) return depthMap[id]
+    if (visited.has(id)) return 1
+    visited.add(id)
+
+    const skill = skills.find((s) => s.id === id)
+    if (!skill || skill.prerequisites.length === 0) {
+      depthMap[id] = 1
+      return 1
+    }
+
+    const inGraphPrereqs = skill.prerequisites.filter((p) => skillIds.has(p))
+    if (inGraphPrereqs.length === 0) {
+      depthMap[id] = 1
+      return 1
+    }
+
+    const maxP = Math.max(...inGraphPrereqs.map((p) => getDepth(p, new Set(visited))))
+    depthMap[id] = Math.min(6, maxP + 1)
+    return depthMap[id]
+  }
+
+  skills.forEach((s) => getDepth(s.id))
+
+  // Group skills by depth layer
+  const layers: Record<number, typeof skills> = {}
+  skills.forEach((s) => {
+    const d = depthMap[s.id] || 1
+    if (!layers[d]) layers[d] = []
+    layers[d].push(s)
+  })
+
+  const nodes: Node<RouteNodeData>[] = []
+  const edges: Edge[] = []
+
+  // Add Start node
+  nodes.push({
+    id: 'start',
+    type: 'skillNode',
+    position: { x: 340, y: 20 },
+    data: {
+      skillId: 'start',
+      label: 'Start',
+      category: 'Foundations',
+      status: 'completed',
+      priority: 'recommended',
+      isStart: true,
+    },
+  })
+
+  const sortedDepths = Object.keys(layers).map(Number).sort((a, b) => a - b)
+  const maxDepth = sortedDepths.length > 0 ? Math.max(...sortedDepths) : 1
+
+  sortedDepths.forEach((d) => {
+    const layerSkills = layers[d]
+    const count = layerSkills.length
+    const spacing = count > 3 ? 180 : count === 3 ? 230 : 270
+    const startX = 340 - ((count - 1) * spacing) / 2
+    const y = 20 + d * 130
+
+    layerSkills.forEach((skill, idx) => {
+      nodes.push({
+        id: skill.id,
+        type: 'skillNode',
+        position: { x: Math.round(startX + idx * spacing), y },
+        data: {
+          skillId: skill.id,
+          label: skill.name,
+          category: skill.category,
+          status: skill.status,
+          priority: skill.priority,
+        },
+      })
+
+      // If depth 1, connect to start
+      if (d === 1) {
+        edges.push({
+          id: `e-start-${skill.id}`,
+          source: 'start',
+          target: skill.id,
+          type: 'smoothstep',
+          animated: skill.status === 'next',
+        })
+      }
+
+      // Connect prerequisites in graph
+      skill.prerequisites.forEach((pId) => {
+        if (skillIds.has(pId)) {
+          edges.push({
+            id: `e-${pId}-${skill.id}`,
+            source: pId,
+            target: skill.id,
+            type: 'smoothstep',
+            animated: skill.status === 'next',
+          })
+        }
+      })
+    })
+  })
+
+  // Find terminal skills
+  const nonTerminalIds = new Set<string>()
+  skills.forEach((s) => {
+    s.prerequisites.forEach((p) => nonTerminalIds.add(p))
+  })
+  const terminalSkills = skills.filter((s) => !nonTerminalIds.has(s.id))
+  const finalConnectors = terminalSkills.length > 0 ? terminalSkills : layers[maxDepth] || []
+
+  // Add Goal Node
+  const goalY = 20 + (maxDepth + 1) * 130
+  nodes.push({
+    id: 'goal',
+    type: 'skillNode',
+    position: { x: 340, y: goalY },
+    data: {
+      skillId: 'goal',
+      label: destinationTitle,
+      category: 'Foundations',
+      status: 'locked',
+      priority: 'critical',
+      isGoal: true,
+    },
+  })
+
+  finalConnectors.forEach((s) => {
+    edges.push({
+      id: `e-${s.id}-goal`,
+      source: s.id,
+      target: 'goal',
+      type: 'smoothstep',
+      animated: false,
+    })
+  })
+
+  return { nodes, edges }
+}
+
 export function getRouteGraphData(
   routeId: string,
-  destinationTitle?: string
+  destinationId?: string,
+  destinationTitle?: string,
+  currentSkillIds: string[] = []
 ): { nodes: Node<RouteNodeData>[]; edges: Edge[] } {
+  // If destination is specified and NOT ai-ml-engineer, generate dynamic DAG for that domain!
+  if (destinationId && destinationId !== 'ai-ml-engineer') {
+    return generateDestinationGraph(
+      destinationId,
+      routeId,
+      destinationTitle || 'Career Destination',
+      currentSkillIds
+    )
+  }
+
+  // For ai-ml-engineer, use tuned graphs with updated goal title
   let baseNodes: Node<RouteNodeData>[]
   let baseEdges: Edge[]
 
@@ -446,7 +614,6 @@ export function getRouteGraphData(
     baseEdges = balancedRouteEdges
   }
 
-  // Clone nodes to update goal label dynamically if destinationTitle is provided
   const nodes = baseNodes.map((n) => {
     if (n.data?.isGoal && destinationTitle) {
       return {

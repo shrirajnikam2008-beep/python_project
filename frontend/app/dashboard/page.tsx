@@ -51,6 +51,10 @@ const typeIcons: Record<OpportunityType, React.ElementType> = {
   Research: Microscope,
   Incubator: Rocket,
   Competition: Trophy,
+  Fellowship: Microscope,
+  Scholarship: Trophy,
+  'Open Source': Rocket,
+  'Student Program': Briefcase,
 }
 
 const typeBadges: Record<OpportunityType, { label: string; bg: string; text: string; border: string }> = {
@@ -59,7 +63,12 @@ const typeBadges: Record<OpportunityType, { label: string; bg: string; text: str
   Research: { label: 'Research', bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200' },
   Incubator: { label: 'Incubator & Startup', bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200' },
   Competition: { label: 'Competition', bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
+  Fellowship: { label: 'Fellowship', bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200' },
+  Scholarship: { label: 'Scholarship', bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
+  'Open Source': { label: 'Open Source', bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
+  'Student Program': { label: 'Student Program', bg: 'bg-indigo-50', text: 'text-indigo-700', border: 'border-indigo-200' },
 }
+
 
 export default function DashboardPage() {
   const [profile, setProfile] = useState<StudentProfile | null>(null)

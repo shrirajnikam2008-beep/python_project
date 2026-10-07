@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Waypoint — Frontend Architecture Master Guide</title>
+<style>
+  @page {
+    size: A4;
+    margin: 14mm 14mm 14mm 14mm;
+    @bottom-right {
+      content: "Page " counter(page);
+      font-size: 8.5px;
+      color: #94a3b8;
+    }
+  }
+  * {
+    box-sizing: border-box;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #0f172a;
+    background: #ffffff;
+    line-height: 1.48;
+    font-size: 11px;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 5px;
+    margin-bottom: 14px;
+    font-size: 8.5px;
+    color: #64748b;
+    font-weight: 600;
+  }
+
+  .cover {
+    text-align: center;
+    padding: 20px 14px 16px 14px;
+    margin-bottom: 18px;
+    background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+  }
+  .brand-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #0b192c;
+    color: white;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+  }
+  .cover h1 {
+    font-size: 26px;
+    font-weight: 900;
+    color: #0b192c;
+    letter-spacing: -0.03em;
+    margin: 0 0 6px 0;
+  }
+  .cover .sub {
+    font-size: 13px;
+    color: #1d4ed8;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .cover .sub2 {
+    font-size: 11px;
+    color: #475569;
+    margin-bottom: 10px;
+  }
+  .cover .meta {
+    display: inline-block;
+    background: #e2e8f0;
+    padding: 3px 12px;
+    border-radius: 9999px;
+    font-size: 9.5px;
+    font-weight: 600;
+    color: #1e293b;
+  }
+
+  .banner-box {
+    background: #f0fdf4;
+    border: 1px solid #86efac;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    font-size: 10.5px;
+    line-height: 1.45;
+  }
+  .banner-box strong {
+    color: #15803d;
+  }
+
+  .alert-box {
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    font-size: 10.5px;
+    line-height: 1.45;
+  }
+  .alert-box strong {
+    color: #b91c1c;
+  }
+
+  .tip-box {
+    background: #eff6ff;
+    border: 1px solid #93c5fd;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    font-size: 10.5px;
+    line-height: 1.45;
+  }
+  .tip-box strong {
+    color: #1d4ed8;
+  }
+
+  h2 {
+    font-size: 15px;
+    font-weight: 800;
+    color: #0f172a;
+    border-bottom: 2px solid #0f172a;
+    padding-bottom: 4px;
+    margin-top: 22px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  h2 .num {
+    background: #2563eb;
+    color: white;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-weight: 800;
+  }
+
+  h3 {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-top: 14px;
+    margin-bottom: 6px;
+  }
+
+  h4 {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #334155;
+    margin-top: 10px;
+    margin-bottom: 4px;
+  }
+
+  p {
+    margin: 0 0 8px 0;
+  }
+
+  ul, ol {
+    margin: 0 0 8px 0;
+    padding-left: 18px;
+  }
+  li {
+    margin-bottom: 3px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 12px;
+    font-size: 10px;
+  }
+  th {
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    padding: 5px 8px;
+    text-align: left;
+    font-weight: 700;
+    color: #1e293b;
+  }
+  td {
+    border: 1px solid #e2e8f0;
+    padding: 5px 8px;
+    vertical-align: top;
+  }
+  tr:nth-child(even) td {
+    background: #f8fafc;
+  }
+
+  code {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 9.5px;
+    background: #f1f5f9;
+    padding: 1.5px 4px;
+    border-radius: 3px;
+    color: #0f172a;
+    border: 1px solid #e2e8f0;
+  }
+
+  pre {
+    background: #0b1220;
+    color: #e2e8f0;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 9.2px;
+    line-height: 1.35;
+    padding: 10px 12px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 6px 0 10px 0;
+    border: 1px solid #1e293b;
+    page-break-inside: avoid;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 9999px;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .badge-green { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+  .badge-yellow { background: #fef9c3; color: #854d0e; border: 1px solid #fde047; }
+  .badge-red { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+  .badge-blue { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+  .badge-gray { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+
+  .page-break {
+    page-break-after: always;
+  }
+
+  .avoid-break {
+    page-break-inside: avoid;
+  }
+
+  .toc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 16px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    font-size: 10px;
+  }
+  .toc-item {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px dotted #cbd5e1;
+    padding-bottom: 2px;
+  }
+  .toc-item span:first-child {
+    font-weight: 600;
+    color: #1e293b;
+  }
+  .toc-item span:last-child {
+    color: #64748b;
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER / INTRO -->
+<div class="cover">
+  <div class="brand-logo">🧭 WAYPOINT &nbsp;|&nbsp; B.TECH IT TECHNICAL MANUAL</div>
+  <h1>Waypoint Frontend Architecture</h1>
+  <div class="sub">Complete Source Code Walkthrough, React Flow DAG Engine & Engineering Reference</div>
+  <div class="sub2">Written for 1st-Year B.Tech IT Students to Independently Understand, Maintain, Debug & Extend the System</div>
+  <div class="meta">Review 2 Milestone &nbsp;•&nbsp; Next.js 14 App Router &nbsp;•&nbsp; TypeScript &nbsp;•&nbsp; React Flow &nbsp;•&nbsp; Tailwind CSS</div>
+</div>
+
+<div class="banner-box">
+  <strong>Pedagogical Objective:</strong> This manual provides an exhaustive, line-by-line conceptual and structural explanation of the entire Waypoint frontend. It details how routing, custom graph nodes, state management, and the API layer work together, explicitly identifying where real mock simulation is active versus where FastAPI endpoints will be attached in the next phase.
+</div>
+
+<!-- TABLE OF CONTENTS -->
+<div class="avoid-break">
+  <h3>Document Outline & Syllabus</h3>
+  <div class="toc-grid">
+    <div class="toc-item"><span>Part 1: Complete Directory Tree & Map</span> <span>Structure & Flow</span></div>
+    <div class="toc-item"><span>Part 2: Next.js 14 App Router Architecture</span> <span>Server vs Client</span></div>
+    <div class="toc-item"><span>Part 3: End-to-End User Journey Trace</span> <span>11 Full Steps</span></div>
+    <div class="toc-item"><span>Part 4: Major Component Deep Dives</span> <span>Props, Hooks & State</span></div>
+    <div class="toc-item"><span>Part 5: React Flow DAG Graph Engine</span> <span>Topological Layering</span></div>
+    <div class="toc-item"><span>Part 6: API Layer & Endpoint Audit</span> <span>Contract Matrix</span></div>
+    <div class="toc-item"><span>Part 7: TypeScript Domain Types</span> <span>Contracts & Generics</span></div>
+    <div class="toc-item"><span>Part 8: State Management Architecture</span> <span>Context & Storage</span></div>
+    <div class="toc-item"><span>Part 9: Data Flow & Mock Data Inventory</span> <span>Storage Boundaries</span></div>
+    <div class="toc-item"><span>Part 10: Styling & Design System</span> <span>Tailwind & Tokens</span></div>
+    <div class="toc-item"><span>Part 11: Real Implementation Status</span> <span>4 Honest Categories</span></div>
+    <div class="toc-item"><span>Part 12: Senior Code Quality Review</span> <span>Severity Audit</span></div>
+    <div class="toc-item"><span>Part 13: Recommended Learning Roadmap</span> <span>Ordered Curriculum</span></div>
+    <div class="toc-item"><span>Part 14: Progressive Code Walkthrough</span> <span>From Utils to DAG</span></div>
+    <div class="toc-item"><span>Part 15: Master System Architecture Map</span> <span>End-to-End Diagram</span></div>
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- PART 1 -->
+<div class="page-header">
+  <span>WAYPOINT FRONTEND MANUAL</span>
+  <span>PART 1: CODEBASE STRUCTURE & DEPENDENCY MAP</span>
+</div>
+
+<h2><span class="num">01</span> Complete Frontend Directory Structure</h2>
+
+<p>The Waypoint frontend is structured under <code>frontend/</code> following modern Next.js 14 conventions. Every file has a single, well-defined responsibility, ensuring maintainability as the project scales.</p>
+
+<pre>
+frontend/
+├── app/                              # Next.js App Router (Routing, Layouts, & Viewports)
+│   ├── layout.tsx                    # Root Layout: HTML shell, Inter font, AuthProvider, globals.css
+│   ├── page.tsx                      # Public Landing Page: Hero, Value Proposition, How It Works
+│   ├── loading.tsx                   # Automated Suspense Fallback during route transitions
+│   ├── error.tsx                     # Global Client-side Error Boundary with retry handler
+│   ├── not-found.tsx                 # 404 Catch-all View
+│   ├── login/page.tsx                # Student Authentication & Login Form
+│   ├── signup/page.tsx               # Student Registration Form
+│   ├── onboarding/page.tsx            # 4-Step Academic & Goal Selection Wizard
+│   ├── dashboard/page.tsx             # Main Intelligence Hub (ProgressRing, Journey, NextStep)
+│   ├── routes/page.tsx               # 3-Way Route Comparison Screen (Balanced, Fast, Foundation)
+│   ├── route/[id]/                   # Dynamic Route Visualization Segment
+│   │   ├── page.tsx                  # Server Component route wrapper
+│   │   └── RouteMapClient.tsx        # Client dynamic boundary (ssr: false for React Flow)
+│   ├── skill-gaps/page.tsx           # Categorized Skill Deficit Audit (Critical, High, Recommended)
+│   └── opportunities/page.tsx        # Action Ecosystem (Hackathons, Internships, Research Labs)
+├── components/                       # Modular, Reusable React Components
+│   ├── auth/AuthGuard.tsx            # Route Protection Gatekeeper (checks session token)
+│   ├── crowd-trails/CrowdTrails.tsx  # Senior Alumni Trajectory & Course Path Visualizer (Scaffolded)
+│   ├── dashboard/                    # Dashboard Overview Widgets
+│   │   ├── JourneyCard.tsx           # Target Goal Card with SVG Circular Progress Ring
+│   │   ├── JourneyProgress.tsx       # Horizontal Timeline Progression Strip
+│   │   ├── NextStepCard.tsx          # High-Priority Recommended Immediate Action Banner
+│   │   ├── RouteCardPreview.tsx      # Mini Route Metric Summary Card
+│   │   └── SkillGapSummary.tsx       # Priority-Segmented Deficit Breakdown Box
+│   ├── landing/                      # Landing Page Components
+│   │   ├── HeroRouteViz.tsx          # Animated SVG Mini-Graph Preview
+│   │   ├── HeroSection.tsx           # Landing Headline & Primary Call-to-Action
+│   │   └── HowItWorks.tsx            # 3-Step Systematic Explanation Grid
+│   ├── layout/                       # Structural Application Shell
+│   │   ├── AppShell.tsx              # Unified Master Layout (Sidebar + Topbar + Content)
+│   │   ├── Sidebar.tsx               # Fixed 224px Left Rail with Active Path Highlights
+│   │   └── Topbar.tsx                # Top Header with Breadcrumbs & Profile Dropdown
+│   ├── onboarding/                   # Onboarding Wizard Steps
+│   │   ├── ProfileStep.tsx           # Step 1: Name, Degree Program, & Semester
+│   │   ├── AcademicStep.tsx          # Step 2: CGPA & Completed Credits with Visual Standing
+│   │   ├── SkillsStep.tsx            # Step 3: Current Acquired Skills Tag Cloud
+│   │   ├── DestinationStep.tsx       # Step 4: Career Role Selection Cards
+│   │   └── ProgressStepper.tsx       # 4-Stage Visual Progress Bar
+│   ├── opportunities/                # Opportunity Radar UI
+│   │   └── OpportunitiesList.tsx     # Filterable, Searchable Opportunity Card Feed
+│   ├── route-map/                    # Interactive React Flow DAG Engine
+│   │   ├── RouteMap.tsx              # Canvas Container, Controls, MiniMap, & State
+│   │   ├── SkillNode.tsx             # Custom React Flow Node Component (Handles & Status)
+│   │   ├── SkillDetailPanel.tsx      # Slide-Over Drawer with Curated Study Resources
+│   │   └── MapLegend.tsx             # Floating Visual Status & Category Color Legend
+│   ├── routes/RouteCard.tsx          # Detailed Route Metric Card with Step Timeline
+│   ├── skill-gaps/                   # Skill Deficit Breakdown UI
+│   │   ├── SkillCard.tsx             # Interactive Skill Card with Expandable Why-It-Matters
+│   │   └── SkillGapSection.tsx       # Section Container grouped by Priority Level
+│   └── ui/                           # Design System Primitives
+│       ├── Button.tsx                # Polymorphic Button with loading spinner and icon slots
+│       ├── Badge.tsx                 # Semantic Status Badges (success, warning, danger, info)
+│       ├── Card.tsx                  # Accessible Container with hover elevation
+│       ├── ProgressBar.tsx           # Linear Animated Progress Bar
+│       ├── ProgressRing.tsx          # SVG Radial Progress Indicator
+│       ├── SkeletonLoader.tsx        # Shimmer Loading Placeholders
+│       ├── EmptyState.tsx            # Zero Search Results / Empty List Display
+│       └── ErrorState.tsx            # API Failure State with "Try Again" trigger
+├── contexts/AuthContext.tsx          # React Context for Global Authentication & User Session
+├── hooks/                            # Custom React Hooks
+│   ├── useRoute.ts                   # Route loading and graph state hook
+│   └── useStudentProfile.ts          # Student profile lifecycle hook
+├── lib/                              # Core Domain Logic & Data Layer
+│   ├── api.ts                        # Central API Abstraction Layer (Network / Storage)
+│   ├── types.ts                      # Strict TypeScript Interfaces & Domain Models
+│   ├── utils.ts                      # Tailwind Merger (`cn`), Formatters, Color Helpers
+│   └── mock-data/                    # Local Simulated Database
+│       ├── catalog.ts                # University Course Catalog & Syllabi
+│       ├── destinations.ts           # Career Roles (AI/ML, SDE, Data, Cyber, Cloud, Core)
+│       ├── opportunities.ts          # Hackathons, Internships, Research Fellowships
+│       ├── routes.ts                 # Handcrafted & Procedural Topological DAG Layouts
+│       ├── skills.ts                 # Skill Registry with Prerequisites & Dependent Graph
+│       └── student.ts                # Baseline Student Profile (Alex, 5th Sem IT)
+├── styles/globals.css                # Tailwind Directives, Inter Typeface, React Flow Styles
+├── tailwind.config.ts                # Tailwind Custom Palette (Navy-50 to 950) & Keyframes
+├── tsconfig.json                     # Strict TypeScript Settings & Path Aliases (@/*)
+└── package.json                      # Project Manifest & Execution Scripts
+</pre>
+
+<h3>System Dependency Flow Diagram</h3>
+
+<pre>
+[ User Browser (Interactions, Clicks, Keystrokes) ]
+       │
+       ▼
+[ Next.js App Router (app/layout.tsx) ]
+       │
+       ├──► [ AuthProvider (contexts/AuthContext.tsx) ] ──► [ localStorage (Session/Accounts) ]
+       │
+       ▼
+[ Page Views (app/**/page.tsx) ]
+       │
+       ├──► Protected by [ AuthGuard (components/auth/AuthGuard.tsx) ]
+       │
+       ├──► Wrapped in [ AppShell (components/layout/AppShell.tsx) ]
+       │         ├──► [ Sidebar.tsx ] (Nav Links & Framer Motion indicator)
+       │         └──► [ Topbar.tsx ] (Breadcrumbs & Profile avatar)
+       │
+       ├──► Feature Components:
+       │         ├── [ RouteMap.tsx ] ────► React Flow Canvas
+       │         │        ├──► [ SkillNode.tsx ] (Custom Handles & Status styling)
+       │         │        └──► [ SkillDetailPanel.tsx ] (Slide-over drawer)
+       │         ├── [ JourneyCard.tsx ] ──► SVG ProgressRing
+       │         ├── [ SkillGapSection.tsx ] ──► [ SkillCard.tsx ]
+       │         └── [ OpportunitiesList.tsx ] ──► Filterable Opportunity Cards
+       │
+       ▼
+[ Central API Layer (frontend/lib/api.ts) ]
+       │
+       ├──► (Review 2 Demo Mode): [ lib/mock-data/*.ts ] + Browser localStorage
+       │
+       ▼ (Future Review 3 Milestone)
+[ FastAPI Backend (`http://localhost:8000/api/v1/...`) ]
+</pre>
+
+<div class="page-break"></div>
+
+<!-- PART 2 -->
+<div class="page-header">
+  <span>WAYPOINT FRONTEND MANUAL</span>
+  <span>PART 2: NEXT.JS 14 APP ROUTER ARCHITECTURE</span>
+</div>
+
+<h2><span class="num">02</span> Next.js Architecture Explained</h2>
+
+<p>Waypoint is built with <strong>Next.js 14</strong> using the <strong>App Router</strong> paradigm. Rather than configuring complex routing files like in standard React (React Router), Next.js maps the folder hierarchy inside <code>frontend/app/</code> directly to URL routes.</p>
+
+<h3>Core App Router Conventions in Waypoint</h3>
+<ul>
+  <li><code>layout.tsx</code>: The root wrapper. Runs on initial load to set up <code>&lt;html&gt;</code>, <code>&lt;body&gt;</code>, mounts global CSS, and wraps everything in <code>&lt;AuthProvider&gt;</code>. It persists state across page changes without re-mounting.</li>
+  <li><code>page.tsx</code>: Represents the publicly accessible leaf component for that URL segment.</li>
+  <li><code>loading.tsx</code>: Built on React <code>&lt;Suspense&gt;</code>. Next.js automatically shows this centered spinner while data is resolving during route transitions.</li>
+  <li><code>error.tsx</code>: Global client-side error boundary (must declare <code>'use client'</code>). Catches unhandled runtime exceptions in child components and renders a friendly retry screen without crashing the whole tab.</li>
+  <li><code>not-found.tsx</code>: Default 404 handler rendered when an invalid URL is requested.</li>
+</ul>
+
+<h3>Server vs. Client Components (<code>'use client'</code>)</h3>
+<p>By default, every component in Next.js 14 is a <strong>Server Component</strong>. Server Components execute solely on the server, generating zero JavaScript in the client's browser bundle.</p>
+<p>However, whenever a component needs:</p>
+<ol>
+  <li>Browser APIs (e.g., <code>localStorage</code>, <code>window</code>, <code>document</code>)</li>
+  <li>React State or Lifecycle hooks (<code>useState</code>, <code>useEffect</code>, <code>useCallback</code>)</li>
+  <li>User interactivity (e.g., <code>onClick</code>, <code>onChange</code>, <code>onSubmit</code>)</li>
+  <li>Third-party canvas manipulation (e.g., <code>React Flow</code>)</li>
+</ol>
+<p>It must declare <code>'use client'</code> at the very top of the file. In Waypoint, interactive viewports (like Dashboard, Onboarding, and Opportunities) are Client Components.</p>
+
+<div class="avoid-break">
+  <h3>Special Architectural Pattern: <code>RouteMapClient.tsx</code></h3>
+  <p>React Flow relies heavily on browser DOM measurement (calculating bounding boxes for SVG bezier curves). During Next.js server-side pre-rendering, Node.js has no DOM, which causes hydration mismatches or server crashes.</p>
+  <p>Waypoint elegantly solves this in <code>frontend/app/route/[id]/RouteMapClient.tsx</code>:</p>
+  <pre>
+import dynamic from 'next/dynamic'
+import { SkeletonCard } from '@/components/ui/SkeletonLoader'
+
+export const RouteMap = dynamic(
+  () => import('@/components/route-map/RouteMap').then((m) => m.RouteMap),
+  {
+    ssr: false, // Disables server pre-rendering for the canvas!
+    loading: () => &lt;div className="h-full flex items-center justify-center"&gt;&lt;SkeletonCard /&gt;&lt;/div&gt;,
+  }
+)
+  </pre>
+</div>
+
+<h3>Route Navigation Matrix</h3>
+<table>
+  <thead>
+    <tr>
+      <th>URL Route</th>
+      <th>Source File</th>
+      <th>Component Type</th>
+      <th>What Happens Upon Navigation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>/</code></td>
+      <td><code>app/page.tsx</code></td>
+      <td>Client Component</td>
+      <td>Renders marketing landing page, animated hero graph, and "Get Started" call-to-actions.</td>
+    </tr>
+    <tr>
+      <td><code>/login</code></td>
+      <td><code>app/login/page.tsx</code></td>
+      <td>Client Component</td>
+      <td>Renders sign-in form. Calls <code>authLogin()</code>, stores session in <code>localStorage</code>, pushes to <code>/dashboard</code>.</td>
+    </tr>
+    <tr>
+      <td><code>/signup</code></td>
+      <td><code>app/signup/page.tsx</code></td>
+      <td>Client Component</td>
+      <td>Renders registration form. Creates account credentials, sets session, and routes to <code>/onboarding</code>.</td>
+    </tr>
+    <tr>
+      <td><code>/onboarding</code></td>
+      <td><code>app/onboarding/page.tsx</code></td>
+      <td>Client Component</td>
+      <td>4-step wizard. Saves completed <code>StudentProfile</code> to <code>localStorage</code> and routes to <code>/dashboard</code>.</td>
+    </tr>
+    <tr>
+      <td><code>/dashboard</code></td>
+      <td><code>app/dashboard/page.tsx</code></td>
+      <td>Client Component</td>
+      <td>Protected by <code>AuthGuard</code>. Loads student profile, calculates progress %, displays next actionable step and opportunity radar.</td>
+    </tr>
+    <tr>
+      <td><code>/routes</code></td>
+      <td><code>app/routes/page.tsx</code></td>
+      <td>Client Component</td>
+      <td>Loads all 3 generated routes and renders the side-by-side comparison table (Balanced, Fast Track, Foundation First).</td>
+    </tr>
+    <tr>
+      <td><code>/route/[id]</code></td>
+      <td><code>app/route/[id]/page.tsx</code></td>
+      <td>Server/Client Hybrid</td>
+      <td>Extracts route ID slug (e.g. <code>balanced</code>), mounts React Flow client canvas without SSR, and renders interactive skill graph.</td>
+    </tr>
+    <tr>
+      <td><code>/skill-gaps</code></td>
+      <td><code>app/skill-gaps/page.tsx</code></td>
+      <td>Client Component</td>
+      <td>Computes missing competencies against target destination requirements; groups them into Critical, High, and Recommended.</td>
+    </tr>
+    <tr>
+      <td><code>/opportunities</code></td>
+      <td><code>app/opportunities/page.tsx</code></td>
+      <td>Client Component</td>
+      <td>Renders actionable hackathons, internships, and research grants matching the student's selected branch and destination.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="page-break"></div>
+
+<!-- PART 3 -->
+<div class="page-header">
+  <span>WAYPOINT FRONTEND MANUAL</span>
+  <span>PART 3: USER JOURNEY WALKTHROUGH</span>
+</div>
+
+<h2><span class="num">03</span> Trace the Application From Start to Finish</h2>
+
+<p>To understand how data flows across the system, let us trace the complete journey of a new student using Waypoint from initial visit to opportunity application.</p>
+
+<div class="avoid-break">
+  <h3>Step 1: User Opens Website & Views Landing Page</h3>
+  <ul>
+    <li><strong>Files:</strong> <code>frontend/app/layout.tsx</code> &rarr; <code>frontend/app/page.tsx</code> &rarr; <code>HeroSection.tsx</code></li>
+    <li><strong>Component:</strong> <code>LandingPage()</code>, <code>HeroSection()</code>, <code>HeroRouteViz()</code></li>
+    <li><strong>State:</strong> Framer Motion entrance animation states (<code>opacity: 0, y: 24</code> &rarr; <code>opacity: 1, y: 0</code>).</li>
+    <li><strong>Data:</strong> Static SVG visual graph showing nodes (You, Python, Linear Algebra, Data Structures, Machine Learning).</li>
+    <li><strong>API Call:</strong> None. Static marketing presentation. Clicking "Start Your Journey" routes to <code>/onboarding</code>.</li>
+  </ul>
+</div>
+
+<div class="avoid-break">
+  <h3>Step 2: User Signs Up / Authenticates</h3>
+  <ul>
+    <li><strong>Files:</strong> <code>frontend/app/signup/page.tsx</code> &rarr; <code>frontend/contexts/AuthContext.tsx</code></li>
+    <li><strong>Function:</strong> <code>handleSignup(e: React.FormEvent)</code> invokes <code>signup()</code> from <code>useAuth()</code>.</li>
+    <li><strong>API Invocation:</strong> <code>authSignup(name, email, password)</code> in <code>frontend/lib/api.ts</code>.</li>
+    <li><span class="badge badge-yellow">SIMULATED IN BROWSER STORAGE</span>: Validates email uniqueness, creates an account object, encodes credentials via <code>btoa</code>, writes to <code>localStorage.setItem('waypoint_accounts', ...)</code> and <code>localStorage.setItem('waypoint_session', ...)</code>, then pushes router to <code>/onboarding</code>.</li>
+  </ul>
+</div>
+
+<div class="avoid-break">
+  <h3>Step 3: User Completes 4-Step Onboarding</h3>
+  <ul>
+    <li><strong>File:</strong> <code>frontend/app/onboarding/page.tsx</code></li>
+    <li><strong>Component:</strong> <code>OnboardingPage()</code> with sub-components:
+      <ol>
+        <li><code>ProfileStep.tsx</code>: Captures <code>name</code>, <code>program</code> (e.g., B.Tech IT), and <code>semester</code>.</li>
+        <li><code>AcademicStep.tsx</code>: Captures <code>cgpa</code> (e.g., 8.2) and <code>creditsCompleted</code> (60). Computes dynamic standing badge.</li>
+        <li><code>SkillsStep.tsx</code>: Multi-select pill cloud toggling acquired skills into <code>currentSkills</code> array.</li>
+        <li><code>DestinationStep.tsx</code>: Calls <code>getDestinations()</code> and renders selectable <code>DestinationCard</code> components.</li>
+      </ol>
+    </li>
+    <li><strong>Final Submission:</strong> Calls <code>createStudentProfile(finalProfile)</code> in <code>lib/api.ts</code>.</li>
+    <li><span class="badge badge-yellow">SIMULATED IN BROWSER STORAGE</span>: Commits profile JSON to <code>localStorage.setItem('waypoint_profile', ...)</code> and redirects to <code>/dashboard</code>.</li>
+  </ul>
+</div>
+
+<div class="avoid-break">
+  <h3>Step 4: User Reaches Dashboard Overview</h3>
+  <ul>
+    <li><strong>File:</strong> <code>frontend/app/dashboard/page.tsx</code> (enclosed by <code>AuthGuard</code> and <code>AppShell</code>).</li>
+    <li><strong>API Invocation:</strong> <code>Promise.all([getStudentProfile(), getRoutes()])</code>.</li>
+    <li><strong>Execution:</strong> Resolves profile from <code>localStorage</code> (or <code>mockStudent</code>). Computes progress:
+      <br><code>progress = Math.round((completedSkills / totalRequiredSkills) * 100)</code>
+    </li>
+    <li><strong>Components Rendered:</strong> <code>JourneyCard</code> (SVG ProgressRing), <code>JourneyProgress</code> (sequential milestone nodes), <code>NextStepCard</code>, and <code>RouteCardPreview</code>.</li>
+  </ul>
+</div>
+
+<div class="avoid-break">
+  <h3>Step 5: User Inspects Skill Gaps</h3>
+  <ul>
+    <li><strong>File:</strong> <code>frontend/app/skill-gaps/page.tsx</code></li>
+    <li><strong>API Invocation:</strong> <code>getSkillGaps(profile.currentSkills, profile.selectedDestinationId)</code>.</li>
+    <li><strong>Execution:</strong> Calculates set difference between destination requirements and student skills. Categorizes missing skills into <strong>Critical</strong> (immediate prerequisites), <strong>High Priority</strong>, and <strong>Recommended</strong>.</li>
+    <li><strong>Component:</strong> <code>SkillCard.tsx</code> renders expandable details explaining why the skill matters and downstream dependencies.</li>
+  </ul>
+</div>
+
+<div class="avoid-break">
+  <h3>Step 6: User Explores & Interacts with Route Map</h3>
+  <ul>
+    <li><strong>Files:</strong> <code>app/route/[id]/page.tsx</code> &rarr; <code>components/route-map/RouteMap.tsx</code></li>
+    <li><strong>API Invocation:</strong> <code>getRouteGraph(routeId, profile.selectedDestinationId, destinationTitle, profile.currentSkills)</code>.</li>
+    <li><strong>Algorithm:</strong> <code>generateDestinationGraph()</code> computes topological depth for each skill, positions nodes vertically by layer ($y = 20 + 	ext{depth} 	imes 130$) and horizontally centered across $X=340$, connecting prerequisites via smoothstep orthogonal bezier edges.</li>
+    <li><strong>Interactions:</strong>
+      <ul>
+        <li>Pan & Zoom canvas via mouse wheel/drag.</li>
+        <li>Clicking "Focus Next Skill" calls <code>reactFlowInstance.setCenter(100, 220, { zoom: 1.2, duration: 600 })</code>.</li>
+        <li>Clicking any skill node opens <code>SkillDetailPanel.tsx</code> drawer displaying curated study resources.</li>
+      </ul>
+    </li>
+  </ul>
+</div>
+
+<div class="avoid-break">
+  <h3>Step 7: User Discovers Opportunities</h3>
+  <ul>
+    <li><strong>File:</strong> <code>frontend/app/opportunities/page.tsx</code></li>
+    <li><strong>API Invocation:</strong> <code>getOpportunities(destinationId, activeType, filterMode)</code>.</li>
+    <li><strong>Execution:</strong> Returns real-world contests (Smart India Hackathon, Google Summer of Code, DRDO Fellowships) matched to the student's career target. Users can filter by category pills, search by keywords, bookmark, or click "Apply Now".</li>
+  </ul>
+</div>
+
+<div class="page-break"></div>
+
+<!-- PART 4 -->
+<div class="page-header">
+  <span>WAYPOINT FRONTEND MANUAL</span>
+  <span>PART 4: MAJOR COMPONENT DEEP DIVES</span>
+</div>
+
+<h2><span class="num">04</span> Major Component Deep Dives</h2>
+
+<h3>1. <code>components/route-map/RouteMap.tsx</code> (Graph Engine)</h3>
+<ul>
+  <li><strong>Role:</strong> Hosts the React Flow canvas, top floating control bar, mini-map, and slide-out detail drawer.</li>
+  <li><strong>Props:</strong> <code>{ routeId: string }</code></li>
+  <li><strong>State Hooks:</strong>
+    <ul>
+      <li><code>[nodes, setNodes, onNodesChange] = useNodesState([])</code>: React Flow node array and change listener.</li>
+      <li><code>[edges, setEdges, onEdgesChange] = useEdgesState([])</code>: React Flow edge array and change listener.</li>
+      <li><code>selectedSkill: Skill | null</code>: Currently clicked skill; opens slide-out drawer when non-null.</li>
+      <li><code>loading: boolean, error: string | null</code>: Async status flags.</li>
+    </ul>
+  </li>
+  <li><strong>Event Handlers:</strong>
+    <ul>
+      <li><code>onNodeClick</code>: Reads <code>node.data.skillId</code>, finds the skill, and populates <code>selectedSkill</code>.</li>
+      <li><code>onPaneClick</code>: Deselects the active skill and closes the slide-out drawer.</li>
+      <li><code>handleCenterOnNext</code>: Smoothly animates camera to target coordinates using <code>useReactFlow()</code>.</li>
+    </ul>
+  </li>
+</ul>
+
+<h3>2. <code>components/route-map/SkillNode.tsx</code> (Custom Node)</h3>
+<ul>
+  <li><strong>Role:</strong> Custom visual component rendered by React Flow at exact $(x, y)$ coordinates.</li>
+  <li><strong>Props:</strong> Standard <code>NodeProps&lt;RouteNodeData&gt;</code>.</li>
+  <li><strong>Branching Logic:</strong>
+    <ul>
+      <li><code>data.isStart === true</code>: Renders a dark navy Origin badge with an emerald compass icon and a bottom source handle.</li>
+      <li><code>data.isGoal === true</code>: Renders a target destination card with an amber trophy icon and a top target handle.</li>
+      <li><strong>Standard Skill Node:</strong> Renders a 165px card with a category badge, status icon (Green Check for completed, Blue Play for next, Grey Lock for locked), and two <code>&lt;Handle /&gt;</code> connection anchors at top and bottom.</li>
+    </ul>
+  </li>
+  <li><strong>Optimization:</strong> Wrapped in <code>React.memo</code> to prevent unnecessary re-rendering while panning the canvas.</li>
+</ul>
+
+<h3>3. <code>components/dashboard/JourneyCard.tsx</code></h3>
+<ul>
+  <li><strong>Role:</strong> Primary summary card at the top of the student dashboard.</li>
+  <li><strong>Props:</strong> <code>{ destination: string; progress: number; completedSkills: number; totalSkills: number }</code></li>
+  <li><strong>Rendering:</strong> Displays the target destination name with a location pin, acquired vs remaining skill counts, and renders an SVG radial <code>&lt;ProgressRing value={progress} size={88} /&gt;</code>.</li>
+</ul>
+
+<h3>4. <code>components/layout/Sidebar.tsx</code></h3>
+<ul>
+  <li><strong>Role:</strong> Fixed 224px (w-56) left navigation rail.</li>
+  <li><strong>Routing Logic:</strong> Uses Next.js <code>usePathname()</code> hook to compare the current URL against navigation item links (<code>/dashboard</code>, <code>/route/balanced</code>, <code>/skill-gaps</code>, <code>/routes</code>).</li>
+  <li><strong>Animation:</strong> Uses Framer Motion's <code>layoutId="sidebar-indicator"</code> to glide an active blue indicator pill between links as the user navigates.</li>
+</ul>
+
+<h3>5. <code>components/opportunities/OpportunitiesList.tsx</code></h3>
+<ul>
+  <li><strong>Role:</strong> Searchable and filterable directory of contests, internships, and grants.</li>
+  <li><strong>State:</strong>
+    <ul>
+      <li><code>activeTab</code>: <code>'all' | 'trending' | 'closing-soon' | 'new-today'</code></li>
+      <li><code>activeType</code>: <code>'all' | 'Hackathon' | 'Internship' | 'Research' | 'Incubator'</code></li>
+      <li><code>searchQuery</code>: String filter for keyword searching on titles, organizations, and tags.</li>
+      <li><code>bookmarkedIds</code>: Set of bookmarked opportunity IDs persisted in local component state.</li>
+    </ul>
+  </li>
+  <li><strong>Derived Filtering:</strong>
+    <pre>
+const filtered = opportunities.filter((op) => {
+  const matchesSearch = op.title.toLowerCase().includes(query) ||
+                        op.organization.toLowerCase().includes(query)
+  const matchesType = activeType === 'all' || op.type === activeType
+  return matchesSearch && matchesType
+})
+    </pre>
+  </li>
+</ul>
+
+<div class="page-break"></div>
+
+<!-- PART 5 -->
+<div class="page-header">
+  <span>WAYPOINT FRONTEND MANUAL</span>
+  <span>PART 5: REACT FLOW GRAPH ENGINE</span>
+</div>
+
+<h2><span class="num">05</span> React Flow DAG Graph Implementation</h2>
+
+<p>React Flow transforms academic course prerequisites into an interactive, visual <strong>Directed Acyclic Graph (DAG)</strong>. Understanding this subsystem is critical for maintaining Waypoint's core feature.</p>
+
+<pre>
+                  [ Start: Current Profile ]
+                              │
+               ┌──────────────┴──────────────┐
+               ▼                             ▼
+          [ Python ]                      [ Git ]
+               │                             │
+          ┌────┴─────────────┐               │
+          ▼                  ▼               ▼
+   [ Data Structures ] [ Linear Algebra ]  [ Cloud Basics ]
+          │                  │               │
+          ▼                  ▼               │
+       [ SQL ]         [ Statistics ]        │
+          └───────────┬──────┘               │
+                      ▼                      ▼
+               [ Data Analysis ]         [ MLOps ]
+                      │                      │
+                      ▼                      │
+             [ Machine Learning ] ───────────┘
+                      │
+                      ▼
+               [ Deep Learning ]
+                      │
+                      ▼
+            [ Goal: AI / ML Engineer ]
+</pre>
+
+<h3>1. Nodes, Edges, and Custom Types</h3>
+<ul>
+  <li><strong>Nodes (<code>Node&lt;RouteNodeData&gt;</code>):</strong> Represent skills. Contains an <code>id</code>, <code>type: 'skillNode'</code>, canvas coordinates <code>{ x, y }</code>, and a custom data payload (title, category, status, priority).</li>
+  <li><strong>Edges (<code>Edge</code>):</strong> Represent prerequisite connections. Specifies <code>source</code>, <code>target</code>, and <code>type: 'smoothstep'</code>.</li>
+  <li><strong>Handles (<code>&lt;Handle /&gt;</code>):</strong> The anchor coordinates on the custom node where edge paths attach:
+    <ul>
+      <li><code>&lt;Handle type="target" position={Position.Top} /&gt;</code>: Where prerequisite edges enter.</li>
+      <li><code>&lt;Handle type="source" position={Position.Bottom} /&gt;</code>: Where downstream dependent edges leave.</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="avoid-break">
+  <h3>2. Topological Layering Algorithm (<code>generateDestinationGraph</code>)</h3>
+  <p>Located in <code>frontend/lib/mock-data/routes.ts</code>, this algorithm organizes an arbitrary collection of prerequisites into a clean, collision-free vertical layout:</p>
+  <ol>
+    <li><strong>Depth Calculation:</strong> Recursively determines the longest chain of prerequisites for every skill:
+      $$	ext{depth}(S) = 1 + \max_{P \in 	ext{Prerequisites}(S)} 	ext{depth}(P)$$
+      Circular dependencies are guarded using a <code>visited</code> Set.
+    </li>
+    <li><strong>Vertical Slicing:</strong> Skills with the same depth are grouped into horizontal layers. Vertical coordinate is calculated as:
+      $$Y = 20 + 	ext{depth} 	imes 130	ext{px}$$
+    </li>
+    <li><strong>Horizontal Centering:</strong> Skills in each layer are centered symmetrically around canvas midpoint $X = 340$:
+      $$X = 340 - rac{(N - 1) 	imes 	ext{spacing}}{2} + (i 	imes 	ext{spacing})$$
+    </li>
+    <li><strong>Goal Anchoring:</strong> Terminal skills with no downstream dependents connect directly into the final <code>goal</code> node anchored at the bottom:
+      $$Y_{	ext{goal}} = 20 + (	ext{maxDepth} + 1) 	imes 130	ext{px}$$
+    </li>
+  </ol>
+</div>
+
+<div class="page-break"></div>
+
+<!-- PART 6 -->
+<div class="page-header">
+  <span>WAYPOINT FRONTEND MANUAL</span>
+  <span>PART 6: API ARCHITECTURE & INTEGRATION AUDIT</span>
+</div>
+
+<h2><span class="num">06</span> API Architecture & Endpoint Audit</h2>
+
+<p>All data operations go through <code>frontend/lib/api.ts</code>. The function signatures return standard async Promises. This creates a clean abstraction boundary: when the FastAPI backend is connected, <strong>zero UI component files will need modification</strong>.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Frontend Function</th>
+      <th>HTTP</th>
+      <th>Target Endpoint</th>
+      <th>Payload / Params</th>
+      <th>Return Type</th>
+      <th>Calling View</th>
+      <th>Backend Exists?</th>
+      <th>Integration Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>getStudentProfile()</code></td>
+      <td>GET</td>
+      <td><code>/api/student/profile</code></td>
+      <td>None</td>
+      <td><code>StudentProfile</code></td>
+      <td>Dashboard, RouteMap, SkillGaps</td>
+      <td><span class="badge badge-red">NO</span></td>
+      <td><span class="badge badge-yellow">Simulated (localStorage)</span></td>
+    </tr>
+    <tr>
+      <td><code>createStudentProfile()</code></td>
+      <td>POST</td>
+      <td><code>/api/student/profile</code></td>
+      <td><code>StudentProfile</code></td>
+      <td><code>StudentProfile</code></td>
+      <td>OnboardingPage</td>
+      <td><span class="badge badge-red">NO</span></td>
+      <td><span class="badge badge-yellow">Simulated (localStorage)</span></td>
+    </tr>
+    <tr>
+      <td><code>getAllSkills()</code></td>
+      <td>GET</td>
+      <td><code>/api/skills</code></td>
+      <td><code>destinationId?</code></td>
+      <td><code>Skill[]</code></td>
+      <td>SkillGaps, Onboarding</td>
+      <td><span class="badge badge-red">NO</span></td>
+      <td><span class="badge badge-yellow">Simulated (mockSkills)</span></td>
+    </tr>
+    <tr>
+      <td><code>getSkillById(id)</code></td>
+      <td>GET</td>
+      <td><code>/api/skills/{id}</code></td>
+      <td><code>id: string</code></td>
+      <td><code>Skill | null</code></td>
+      <td>RouteMap (on node click)</td>
+      <td><span class="badge badge-red">NO</span></td>
+      <td><span class="badge badge-yellow">Simulated (mockSkills)</span></td>
+    </tr>
+    <tr>
+      <td><code>getSkillGaps()</code></td>
+      <td>GET</td>
+      <td><code>/api/skills/gaps</code></td>
+      <td><code>currentSkillIds, destId</code></td>
+      <td><code>Skill[]</code></td>
+      <td>Dashboard, SkillGaps</td>
+      <td><span class="badge badge-red">NO</span></td>
+      <td><span class="badge badge-yellow">Simulated (mockSkills)</span></td>
+    </tr>
+    <tr>
+      <td><code>getDestinations()</code></td>
+      <td>GET</td>
+      <td><code>/api/destinations</code></td>
+      <td>None</td>
+      <td><code>Destination[]</code></td>
+      <td>DestinationStep</td>
+      <td><span class="badge badge-red">NO</span></td>
+      <td><span class="badge badge-yellow">Simulated (mockDestinations)</span></td>
+    </tr>
+    <tr>
+      <td><code>getDestination(id)</code></td>
+      <td>GET</td>
+      <td><code>/api/destinations/{id}</code></td>
+      <td><code>id: string</code></td>
+      <td><code>Destination</code></td>
+      <td>Dashboard, RouteMap</td>
+      <td><span class="badge badge-red">NO</span></td>
+      <td><span class="badge badge-yellow">Simulated (mockDestinations)</span></td>
+    </tr>
+    <tr>
+      <td><code>getRoutes()</code></td>
+      <td>GET</td>
+      <td><code>/api/routes</code></td>
+      <td>None</td>
+      <td><code>Route[]</code></td>
+      <td>Dashboard, RoutesPage</td>
+      <td><span class="badge badge-red">NO</span></td>
+      <td><span class="badge badge-yellow">Simulated (mockRoutes)</span></td>
+    </tr>
+    <tr>
+      <td><code>getRoute(id)</code></td>
+      <td>GET</td>
+      <td><code>/api/routes/{id}</code></td>
+      <td><code>routeId: string</code></td>
+      <td><code>Route | null</code></td>
+      <td>RoutesPage, RouteMap</td>
+      <td><span class="badge badge-red">NO</span></td>
+      <td><span class="badge badge-yellow">Simulated (mockRoutes)</span></td>
+    </tr>
+    <tr>
+      <td><code>getRouteGraph()</code></td>
+      <td>GET</td>
+      <td><code>/api/routes/{id}/graph</code></td>
+      <td><code>routeId, destId, skills</code></td>
+      <td><code>{ nodes, edges }</code></td>
+      <td>RouteMap</td>
+      <td><span class="badge badge-red">NO</span></td>
+      <td><span class="badge badge-yellow">Simulated (generateDAG)</span></td>
+    </tr>
+    <tr>
+      <td><code>getOpportunities()</code></td>
+      <td>GET</td>
+      <td><code>/api/opportunities</code></td>
+      <td><code>destId, type, filter</code></td>
+      <td><code>Opportunity[]</code></td>
+      <td>OpportunitiesPage</td>
+      <td><span class="badge badge-red">NO</span></td>
+      <td><span class="badge badge-yellow">Simulated (mockOpportunities)</span></td>
+    </tr>
+    <tr>
+      <td><code>authLogin()</code></td>
+      <td>POST</td>
+      <td><code>/api/auth/login</code></td>
+      <td><code>email, password</code></td>
+      <td><code>AuthUser</code></td>
+      <td>LoginPage, AuthContext</td>
+      <td><span class="badge badge-red">NO</span></td>
+      <td><span class="badge badge-yellow">Simulated (localStorage)</span></td>
+    </tr>
+    <tr>
+      <td><code>authSignup()</code></td>
+      <td>POST</td>
+      <td><code>/api/auth/signup</code></td>
+      <td><code>name, email, password</code></td>
+      <td><code>AuthUser</code></td>
+      <td>SignupPage, AuthContext</td>
+      <td><span class="badge badge-red">NO</span></td>
+      <td><span class="badge badge-yellow">Simulated (localStorage)</span></td>
+    </tr>
+    <tr>
+      <td><code>authLogout()</code></td>
+      <td>POST</td>
+      <td><code>/api/auth/logout</code></td>
+      <td>None</td>
+      <td><code>void</code></td>
+      <td>Sidebar, Topbar</td>
+      <td><span class="badge badge-red">NO</span></td>
+      <td><span class="badge badge-yellow">Simulated (localStorage)</span></td>
+    </tr>
+    <tr>
+      <td><code>getCurrentUser()</code></td>
+      <td>GET</td>
+      <td>Sync Storage Read</td>
+      <td>None</td>
+      <td><code>AuthUser | null</code></td>
+      <td>AuthContext</td>
+      <td>N/A</td>
+      <td><span class="badge badge-green">Working (localStorage)</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="tip-box">
+  <strong>How to Connect FastAPI Later:</strong> To wire the frontend to a real backend, replace the functions in <code>frontend/lib/api.ts</code> with <code>fetch()</code> calls. For example:
+  <pre>
+export async function getStudentProfile(): Promise&lt;StudentProfile&gt; {
+  const res = await fetch('http://localhost:8000/api/v1/student/profile', {
+    headers: { Authorization: `Bearer ${getToken()}` },
+  })
+  if (!res.ok) throw new Error('Failed to fetch profile')
+  return res.json()
+}
+  </pre>
+</div>
+
+<div class="page-break"></div>
+
+<!-- PART 7 -->
+<div class="page-header">
+  <span>WAYPOINT FRONTEND MANUAL</span>
+  <span>PART 7: TYPESCRIPT DOMAIN TYPES</span>
+</div>
+
+<h2><span class="num">07</span> TypeScript Types Deep Dive</h2>
+
+<p>All core domain entities are declared in <code>frontend/lib/types.ts</code>. Using strict TypeScript contracts prevents runtime bugs by enforcing shape validity at compile time.</p>
+
+<div class="avoid-break">
+  <h3>1. <code>StudentProfile</code> Entity</h3>
+  <pre>
+export type StudentStage =
+  | 'just-exploring'
+  | 'planning-to-enroll'
+  | 'currently-enrolled'
+  | 'working-professional'
+
+export interface StudentProfile {
+  name: string
+  program: string
+  branch: string
+  studentStage: StudentStage
+  semester?: number              // Optional: omitted for non-enrolled students
+  cgpa?: number                  // Optional: omitted for non-enrolled students
+  creditsCompleted?: number      // Optional
+  currentSkills: string[]        // Array of acquired skill IDs
+  selectedDestinationId: string // Matches Destination.id
+}
+  </pre>
+  <ul>
+    <li><strong>Union Types (<code>|</code>):</strong> <code>StudentStage</code> restricts values to 4 exact strings. Any typo (e.g. <code>'enrolled'</code>) causes a compile-time error.</li>
+    <li><strong>Optional Fields (<code>?</code>):</strong> Fields like <code>cgpa?</code> can be <code>undefined</code>, supporting beginners or graduates without crashing the UI.</li>
+  </ul>
+</div>
+
+<div class="avoid-break">
+  <h3>2. <code>Skill</code> Entity & Prerequisite Graphs</h3>
+  <pre>
+export type SkillStatus = 'completed' | 'in-progress' | 'next' | 'locked'
+export type SkillPriority = 'critical' | 'high' | 'recommended'
+
+export interface Skill {
+  id: string
+  name: string
+  category: SkillCategory
+  description: string
+  currentLevel: 'None' | 'Beginner' | 'Intermediate' | 'Advanced'
+  requiredLevel: 'Beginner' | 'Intermediate' | 'Advanced'
+  status: SkillStatus
+  priority: SkillPriority
+  prerequisites: string[] // Array of prerequisite skill IDs (DAG edges)
+  dependents: string[]   // Array of dependent skill IDs
+  estimatedWeeks: number
+  whyItMatters: string
+  resources?: ResourceLink[]
+}
+  </pre>
+  <p>The <code>prerequisites: string[]</code> and <code>dependents: string[]</code> arrays establish graph relationships without requiring complex pointer structures.</p>
+</div>
+
+<div class="avoid-break">
+  <h3>3. Generics: <code>ApiResponse&lt;T&gt;</code></h3>
+  <pre>
+export interface ApiResponse&lt;T&gt; {
+  data: T | null
+  error: string | null
+  loading: boolean
+}
+  </pre>
+  <p><strong>Generics Explained:</strong> <code>&lt;T&gt;</code> acts as a type placeholder. <code>ApiResponse&lt;StudentProfile&gt;</code> ensures <code>data</code> is typed as a student profile, while <code>ApiResponse&lt;Skill[]&gt;</code> guarantees an array of skills, avoiding duplicate response wrapper types.</p>
+</div>
+
+<div class="page-break"></div>
+
+<!-- PART 8 & 9 -->
+<div class="page-header">
+  <span>WAYPOINT FRONTEND MANUAL</span>
+  <span>PARTS 8 & 9: STATE MANAGEMENT & DATA FLOW</span>
+</div>
+
+<h2><span class="num">08</span> State Management & Hooks Architecture</h2>
+
+<p>Waypoint uses native React state primitives and Context instead of heavy external state stores like Redux, keeping the architecture lean and transparent.</p>
+
+<pre>
+                           ┌─────────────────────────┐
+                           │      AuthContext        │
+                           │  (User Session, State)  │
+                           └────────────┬────────────┘
+                                        │
+             ┌──────────────────────────┼─────────────────────────┐
+             ▼                          ▼                         ▼
+    ┌─────────────────┐        ┌─────────────────┐       ┌─────────────────┐
+    │  OnboardingPage │        │  DashboardPage  │       │  RouteMapInner  │
+    │   (Form State)  │        │ (Profile Data)  │       │ (React Flow DAG)│
+    └────────┬────────┘        └────────┬────────┘       └────────┬────────┘
+             │                          │                         │
+             ▼                          ▼                         ▼
+    ┌─────────────────┐        ┌─────────────────┐       ┌─────────────────┐
+    │  localStorage   │        │   Skill Gap &   │       │   useNodesState │
+    │(Profile/Account)│        │   Route Previews│       │   useEdgesState │
+    └─────────────────┘        └─────────────────┘       └─────────────────┘
+</pre>
+
+<ul>
+  <li><code>AuthContext</code> (Global): Holds <code>user</code> object and authentication methods (<code>login</code>, <code>signup</code>, <code>logout</code>). Restores session on mount from <code>localStorage</code>.</li>
+  <li><code>useNodesState</code> & <code>useEdgesState</code> (Canvas): Internal React Flow hooks. Handles dragging and viewport selections without re-rendering outer layouts.</li>
+  <li><code>useState</code> in Wizard (Local): Manages active step index (0 to 3) and partial profile object.</li>
+  <li><code>usePathname</code> (URL State): Listens to router changes to highlight active navigation tabs in the Sidebar.</li>
+</ul>
+
+<h2><span class="num">09</span> Data Flow & Mock Data Inventory</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Data Classification</th>
+      <th>Where It Resides</th>
+      <th>How It Changes</th>
+      <th>Current Reality in Codebase</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>UI State</strong></td>
+      <td><code>useState</code>, <code>usePathname</code></td>
+      <td>User clicks, keystrokes, active tabs</td>
+      <td><span class="badge badge-green">Real Interactive State</span></td>
+    </tr>
+    <tr>
+      <td><strong>Derived Data</strong></td>
+      <td><code>useMemo</code>, filtered arrays</td>
+      <td>Re-computed during render cycle</td>
+      <td><span class="badge badge-green">Real Calculations</span> (progress %, filters)</td>
+    </tr>
+    <tr>
+      <td><strong>Client Storage</strong></td>
+      <td>Browser <code>localStorage</code></td>
+      <td>Updated by Onboarding / Login</td>
+      <td><span class="badge badge-yellow">Simulated Persistence</span> (keys: <code>waypoint_profile</code>, <code>waypoint_session</code>)</td>
+    </tr>
+    <tr>
+      <td><strong>Simulated Data</strong></td>
+      <td><code>frontend/lib/mock-data/</code></td>
+      <td>Read-only mock repositories</td>
+      <td><span class="badge badge-yellow">Simulated Repositories</span> (skills, routes, destinations)</td>
+    </tr>
+    <tr>
+      <td><strong>Backend Data</strong></td>
+      <td>FastAPI / PostgreSQL</td>
+      <td>Network HTTP requests</td>
+      <td><span class="badge badge-red">Not Connected Yet</span> (planned for next milestone)</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="page-break"></div>
+
+<!-- PART 10 & 11 -->
+<div class="page-header">
+  <span>WAYPOINT FRONTEND MANUAL</span>
+  <span>PARTS 10 & 11: STYLING & IMPLEMENTATION STATUS</span>
+</div>
+
+<h2><span class="num">10</span> Styling & Design System</h2>
+
+<p>Waypoint implements a purposeful, high-contrast design system inspired by tools like Linear and Notion.</p>
+
+<h3>1. Custom Tailwind Tokens (<code>tailwind.config.ts</code>)</h3>
+<p>Extends the standard theme with a dedicated navy palette used for sidebars and headers:</p>
+<ul>
+  <li><code>navy-900</code> (<code>#0F1629</code>) & <code>navy-950</code> (<code>#080d1a</code>): Used for sidebars and deep dark cards.</li>
+  <li><code>blue-600</code> (<code>#2563EB</code>): Primary brand accent, button backgrounds, and active ring borders.</li>
+  <li><code>emerald-500</code> (<code>#10B981</code>): Acquired skills, completed milestones, and origin start nodes.</li>
+  <li><code>amber-500</code> (<code>#F59E0B</code>): Career destination goal nodes and closing-soon deadline alerts.</li>
+</ul>
+
+<h3>2. The Safe Style Merging Helper: <code>cn()</code></h3>
+<p>Located in <code>frontend/lib/utils.ts</code>, this utility prevents CSS class conflicts:</p>
+<pre>
+import { clsx, type ClassValue } from 'clsx'
+import { twMerge } from 'tailwind-merge'
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+</pre>
+<p>If a component defaults to <code>px-4 py-2</code> and a parent passes <code>className="px-6"</code>, <code>twMerge</code> replaces <code>px-4</code> with <code>px-6</code> instead of creating an invalid duplicate.</p>
+
+<h2><span class="num">11</span> What Is Actually Complete? (Honest Audit)</h2>
+
+<div class="avoid-break">
+  <h3>A. Fully Implemented (Genuinely Functional)</h3>
+  <ul>
+    <li>Multi-page routing across all 9 public and protected pages in Next.js 14 App Router.</li>
+    <li>Application shell layout with fixed sidebar, active route indicators, and top breadcrumbs.</li>
+    <li>Multi-step Onboarding wizard collecting and validating academic profile data.</li>
+    <li>Client-side authentication flow (login, signup, logout) backed by browser storage.</li>
+    <li>Route protection gatekeeper (<code>AuthGuard</code>) redirecting unauthenticated users to <code>/login</code>.</li>
+    <li>Interactive React Flow DAG graph rendering with zoom, pan, minimap, and auto-centering.</li>
+    <li>Custom node component (<code>SkillNode</code>) with distinct styles for Start, Goal, Completed, and Locked states.</li>
+    <li>Dynamic topological layout algorithm (<code>generateDestinationGraph</code>) arranging nodes by prerequisite depth.</li>
+    <li>Slide-over skill detail drawer (<code>SkillDetailPanel</code>) showing curated study resources.</li>
+    <li>Opportunity Radar directory with keyword search, category tabs, and bookmark toggling.</li>
+    <li>Complete set of design system primitives (<code>Button</code>, <code>Badge</code>, <code>Card</code>, <code>ProgressRing</code>, <code>ProgressBar</code>, <code>SkeletonLoader</code>, <code>EmptyState</code>, <code>ErrorState</code>).</li>
+  </ul>
+</div>
+
+<div class="avoid-break">
+  <h3>B. Partially Implemented</h3>
+  <ul>
+    <li><strong>Dashboard Analytics:</strong> Computes progress percentage dynamically, but reads data from <code>localStorage</code> rather than an authenticated server session.</li>
+    <li><strong>Route Comparison:</strong> Renders 3 routes side-by-side, but route definitions come from static mock arrays.</li>
+  </ul>
+</div>
+
+<div class="avoid-break">
+  <h3>C. Mocked / Simulated</h3>
+  <ul>
+    <li><strong>Authentication:</strong> Account records are stored in browser <code>localStorage</code>; passwords are base64-encoded via <code>btoa</code> rather than salted/hashed on a server.</li>
+    <li><strong>Skill Registry & Prerequisites:</strong> Reads from in-memory arrays in <code>frontend/lib/mock-data/skills.ts</code>.</li>
+  </ul>
+</div>
+
+<div class="avoid-break">
+  <h3>D. Scaffolded (Future Placeholders)</h3>
+  <ul>
+    <li><code>frontend/components/interest-quiz/InterestQuiz.tsx</code>: Built for future elective discovery.</li>
+    <li><code>frontend/components/market-weather/MarketWeather.tsx</code>: Built for future live job market scraping.</li>
+    <li><code>frontend/components/crowd-trails/CrowdTrails.tsx</code>: Built for future alumni trajectory discovery.</li>
+  </ul>
+</div>
+
+<div class="page-break"></div>
+
+<!-- PART 12 & 13 -->
+<div class="page-header">
+  <span>WAYPOINT FRONTEND MANUAL</span>
+  <span>PARTS 12 & 13: CODE QUALITY & LEARNING ROADMAP</span>
+</div>
+
+<h2><span class="num">12</span> Senior Code Quality & Engineering Review</h2>
+
+<div class="alert-box">
+  <strong>1. [CRITICAL] Insecure Client Storage of Credentials</strong><br>
+  <code>frontend/lib/api.ts</code> stores accounts and passwords in browser <code>localStorage</code> using base64 obfuscation (<code>btoa</code>). In production, any Cross-Site Scripting (XSS) vulnerability or malicious browser extension can read <code>localStorage</code>. For Review 3, authentication must be migrated to HTTP-only, secure, <code>SameSite=Lax</code> JWT session cookies issued by FastAPI.
+</div>
+
+<div class="banner-box" style="background: #fffbeb; border-color: #fde047;">
+  <strong style="color: #b45309;">2. [HIGH] Direct Mock Data Imports Inside Feature Components</strong><br>
+  <code>components/route-map/RouteMap.tsx</code> directly imports <code>getDestinationById</code> from <code>@/lib/mock-data/destinations</code> and <code>getSkillById</code> from <code>@/lib/mock-data/skills</code>, bypassing the API layer. When connecting FastAPI, changing <code>lib/api.ts</code> alone will not update these components. All data requests must go through <code>lib/api.ts</code>.
+</div>
+
+<div class="tip-box">
+  <strong>3. [MEDIUM] Duplicate DAG Generation Implementations</strong><br>
+  <code>lib/mock-data/routes.ts</code> maintains static coordinate arrays for the AI/ML route alongside a dynamic generator (<code>generateDestinationGraph</code>) for other routes. Unifying all routes under the procedural DAG generator will eliminate redundant coordinate maintenance.
+</div>
+
+<h2><span class="num">13</span> Recommended Learning Roadmap</h2>
+
+<p>To master, maintain, and extend this codebase independently as an IT student, follow this curriculum in order:</p>
+
+<ol>
+  <li><strong>JavaScript ES6+ & Async Programming:</strong> Understand arrow functions, destructuring, Promises, and <code>async/await</code>.
+    <br><em>Study:</em> <code>frontend/lib/api.ts</code>, <code>frontend/lib/utils.ts</code>
+  </li>
+  <li><strong>TypeScript Types & Interfaces:</strong> Learn strict interfaces, union types (<code>|</code>), optional fields (<code>?</code>), and Generics (<code>&lt;T&gt;</code>).
+    <br><em>Study:</em> <code>frontend/lib/types.ts</code>
+  </li>
+  <li><strong>React Core & Modern Hooks:</strong> Master component state (<code>useState</code>), side effects (<code>useEffect</code>), memoization (<code>useCallback</code>, <code>React.memo</code>), and Context (<code>useContext</code>).
+    <br><em>Study:</em> <code>frontend/contexts/AuthContext.tsx</code>, <code>frontend/app/dashboard/page.tsx</code>
+  </li>
+  <li><strong>Next.js 14 App Router:</strong> Understand server vs client boundaries (<code>'use client'</code>), dynamic parameters (<code>[id]</code>), and layout hierarchies.
+    <br><em>Study:</em> <code>frontend/app/layout.tsx</code>, <code>frontend/app/route/[id]/page.tsx</code>
+  </li>
+  <li><strong>Tailwind CSS & Design Systems:</strong> Learn utility composition, custom color extensions, responsive prefixes, and conflict-free class merging via <code>cn()</code>.
+    <br><em>Study:</em> <code>frontend/styles/globals.css</code>, <code>frontend/components/ui/Button.tsx</code>
+  </li>
+  <li><strong>React Flow Graph Engine:</strong> Learn custom node authoring, handle attachment points, smoothstep edge routing, and viewport camera manipulation.
+    <br><em>Study:</em> <code>frontend/components/route-map/RouteMap.tsx</code>, <code>frontend/components/route-map/SkillNode.tsx</code>
+  </li>
+  <li><strong>Graph Data Structures (DAGs):</strong> Study topological sorting, recursion, cycle detection, and horizontal layer centering algorithms.
+    <br><em>Study:</em> <code>frontend/lib/mock-data/routes.ts</code> (function <code>generateDestinationGraph</code>)
+  </li>
+</ol>
+
+<div class="page-break"></div>
+
+<!-- PART 14 -->
+<div class="page-header">
+  <span>WAYPOINT FRONTEND MANUAL</span>
+  <span>PART 14: PROGRESSIVE CODE WALKTHROUGH</span>
+</div>
+
+<h2><span class="num">14</span> Progressive Code Walkthrough</h2>
+
+<p>Let us study the codebase progressively, starting from the simplest helper utility and building up to the custom React Flow DAG engine.</p>
+
+<div class="avoid-break">
+  <h3>Step 1: The Foundation Helper &mdash; <code>lib/utils.ts</code></h3>
+  <pre>
+import { type ClassValue, clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+  </pre>
+  <p><strong>Explanation:</strong> This utility takes any number of class arguments, resolves conditional objects via <code>clsx</code>, and passes the result to <code>twMerge</code> to resolve Tailwind class precedence without string collisions.</p>
+</div>
+
+<div class="avoid-break">
+  <h3>Step 2: Reusable UI Primitive &mdash; <code>components/ui/Badge.tsx</code></h3>
+  <pre>
+import { cn } from '@/lib/utils'
+
+type BadgeVariant = 'default' | 'success' | 'warning' | 'danger' | 'info' | 'neutral'
+
+const variants: Record&lt;BadgeVariant, string&gt; = {
+  default: 'bg-blue-50 text-blue-700 border-blue-100',
+  success: 'bg-green-50 text-green-700 border-green-100',
+  warning: 'bg-amber-50 text-amber-700 border-amber-100',
+  danger: 'bg-red-50 text-red-700 border-red-100',
+  info: 'bg-indigo-50 text-indigo-700 border-indigo-100',
+  neutral: 'bg-slate-50 text-slate-600 border-slate-200',
+}
+
+export function Badge({ variant = 'default', children, className, dot }: BadgeProps) {
+  return (
+    &lt;span className={cn('inline-flex items-center gap-1.5 px-2 py-0.5 text-xs font-medium rounded-full border', variants[variant], className)}&gt;
+      {dot && &lt;span className="w-1.5 h-1.5 rounded-full bg-current" /&gt;}
+      {children}
+    &lt;/span&gt;
+  )
+}
+  </pre>
+  <p><strong>Explanation:</strong> A pure presentation component. <code>bg-current</code> ensures the inner dot matches the variant's text color automatically.</p>
+</div>
+
+<div class="avoid-break">
+  <h3>Step 3: Global Session Provider &mdash; <code>contexts/AuthContext.tsx</code></h3>
+  <pre>
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState&lt;AuthUser | null&gt;(null)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const stored = getCurrentUser()
+    setUser(stored)
+    setIsLoading(false)
+  }, [])
+
+  const login = useCallback(async (email: string, password: string) => {
+    const u = await authLogin(email, password)
+    setUser(u)
+  }, [])
+  ...
+}
+  </pre>
+  <p><strong>Explanation:</strong> Restores user sessions from <code>localStorage</code> on initial mount. <code>useCallback</code> memoizes handler functions to prevent unnecessary child re-renders.</p>
+</div>
+
+<div class="avoid-break">
+  <h3>Step 4: Custom Graph Node &mdash; <code>components/route-map/SkillNode.tsx</code></h3>
+  <pre>
+export const SkillNode = memo(function SkillNode({ data, selected }: NodeProps&lt;RouteNodeData&gt;) {
+  if (data.isStart) {
+    return (
+      &lt;div className="relative group"&gt;
+        &lt;Handle type="source" position={Position.Bottom} className="!bg-blue-600 !w-3 !h-3" /&gt;
+        &lt;div className="flex items-center gap-2 px-4 py-2.5 bg-[#0B0F19] text-white rounded-xl"&gt;
+          &lt;Navigation className="w-3.5 h-3.5 text-emerald-400" /&gt;
+          &lt;span className="text-xs font-bold"&gt;Current Profile&lt;/span&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    )
+  }
+  ...
+  return (
+    &lt;div className="relative group"&gt;
+      &lt;Handle type="target" position={Position.Top} className={cn('!w-2.5 !h-2.5', isCompleted ? '!bg-emerald-500' : '!bg-blue-600')} /&gt;
+      &lt;div className={cn('w-[165px] rounded-2xl p-3.5 border-2', isCompleted ? 'border-emerald-300' : 'border-blue-500')}&gt;
+        &lt;h4 className="text-xs font-bold text-slate-900"&gt;{data.label}&lt;/h4&gt;
+        &lt;span className="text-[9px] text-slate-500"&gt;{data.category}&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;Handle type="source" position={Position.Bottom} className={cn('!w-2.5 !h-2.5', isCompleted ? '!bg-emerald-500' : '!bg-blue-600')} /&gt;
+    &lt;/div&gt;
+  )
+})
+  </pre>
+  <p><strong>Explanation:</strong> Renders custom nodes inside React Flow. <code>&lt;Handle /&gt;</code> anchors connection edges at <code>Position.Top</code> and <code>Position.Bottom</code>.</p>
+</div>
+
+<div class="page-break"></div>
+
+<!-- PART 15 -->
+<div class="page-header">
+  <span>WAYPOINT FRONTEND MANUAL</span>
+  <span>PART 15: MASTER ARCHITECTURE MAP</span>
+</div>
+
+<h2><span class="num">15</span> Complete End-to-End System Architecture Map</h2>
+
+<p>This master diagram illustrates the complete architectural pipeline from the user's browser down through the presentation components, API abstraction layer, and target backend services:</p>
+
+<pre>
+[ USER BROWSER ]
+       │
+       ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│ Next.js 14 App Router Shell                                           │
+│ 🟢 Root Layout (app/layout.tsx)                                        │
+│ 🟢 Global AuthProvider (contexts/AuthContext.tsx)                      │
+│ 🟢 Design System Tokens & Animations (styles/globals.css)              │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │
+                                    ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│ Client & Server Route Views                                            │
+│ 🟢 Landing Page (`/` - app/page.tsx)                                   │
+│ 🟢 Authentication (`/login`, `/signup`)                                │
+│ 🟢 Onboarding Wizard (`/onboarding` - 4 Steps)                          │
+│ 🟢 Dashboard Overview (`/dashboard`)                                   │
+│ 🟢 Route Comparison (`/routes` - Balanced vs Fast vs Foundation)      │
+│ 🟢 Interactive React Flow DAG (`/route/[id]`)                          │
+│ 🟢 Skill Deficits Audit (`/skill-gaps`)                                │
+│ 🟢 Action Ecosystem (`/opportunities` - Hackathons & Internships)       │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │
+                                    ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│ Presentation & Component Layer                                         │
+│ 🟢 UI Primitives (Button, Badge, Card, ProgressRing, ProgressBar)      │
+│ 🟢 Layout Rails (Sidebar with active route tracking, Topbar)           │
+│ 🟢 Route Map Engine (RouteMap, SkillNode, SkillDetailPanel)            │
+│ 🟢 Opportunity Engine (OpportunitiesList with live filters)            │
+│ 🟡 Dynamic DAG Layering (generateDestinationGraph algorithm)           │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │
+                                    ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│ Frontend API Layer (frontend/lib/api.ts)                               │
+│ 🟢 Function signatures with async Promises                             │
+│ 🟢 Strict TypeScript interface contracts (lib/types.ts)               │
+│ 🟡 LocalStorage state persistence ('waypoint_profile', 'session')      │
+│ 🟡 In-memory data lookups (lib/mock-data/*.ts)                         │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │
+                              HTTP / REST
+                                    │
+                                    ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│ 🔴 FastAPI Backend (Target Architecture for Next Phase)                │
+│ 🔴 Router: /api/v1/auth (JWT login, register, token refresh)           │
+│ 🔴 Router: /api/v1/student (Profile CRUD, academic records)            │
+│ 🔴 Router: /api/v1/skills (Catalog, prerequisite validation)           │
+│ 🔴 Router: /api/v1/routes (Topological DAG pathfinding engine)         │
+│ 🔴 Router: /api/v1/opportunities (Live scraper / radar aggregator)     │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │
+                                    ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│ 🔴 Business Logic & AI Services Layer                                  │
+│ 🔴 Topological Sorting & Critical Path Engine (NetworkX)               │
+│ 🔴 Market Scraper & Opportunity Ingestion Service                      │
+│ 🔴 Gemini / LLM Elective Recommendation Pipeline                       │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │
+                                    ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│ 🔴 Persistence & Storage Layer                                         │
+│ 🔴 PostgreSQL Database (Relational Profile, Courses, Enrollments)      │
+│ 🔴 Canonical CSV Data Store (data/*.csv)                               │
+│ 🔴 Redis Cache (Hiring velocity & opportunity query caching)           │
+└────────────────────────────────────────────────────────────────────────┘
+
+Legend:
+🟢 IMPLEMENTED & WORKING IN DEMO
+🟡 PARTIALLY IMPLEMENTED (LOGIC WORKS, USES LOCAL STORAGE / MOCK DATA)
+🔴 MISSING / NOT CONNECTED YET (TARGET BACKEND ARCHITECTURE)
+</pre>
+
+<div class="banner-box" style="margin-top: 20px;">
+  <strong>Conclusion & Review 2 Readiness:</strong> The Waypoint frontend is completely decoupled, responsive, and robustly architected. By establishing clean TypeScript interface contracts and standardizing all network operations behind <code>frontend/lib/api.ts</code>, the student team can seamlessly connect the FastAPI backend during Review 3 without redesigning any visual components or user workflows.
+</div>
+
+</body>
+</html>

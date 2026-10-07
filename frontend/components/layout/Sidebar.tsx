@@ -60,7 +60,7 @@ export function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void }) {
 
   const dynamicNavItems = [
     { href: '/dashboard', icon: LayoutDashboard, label: 'Overview', badge: null },
-    { href: '/onboarding', icon: UserCheck, label: 'Profile & Goal', badge: null },
+    { href: '/profile', icon: UserCheck, label: 'Profile & Skills', badge: null },
     { href: '/route/balanced', icon: Map, label: 'My Route', badge: 'Active' },
     { href: '/skill-gaps', icon: BarChart3, label: 'Skill Gaps', badge: `${gapCount} gaps` },
     { href: '/routes', icon: Route, label: 'Routes', badge: '3 paths' },

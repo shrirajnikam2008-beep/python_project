@@ -1,4 +1,69 @@
-skill_id,skill_name,category,difficulty,target_careers
-SKILL_01,Python,Programming,Beginner,AI/ML Engineer;Data Scientist;Backend Developer
-SKILL_02,FastAPI,Backend,Intermediate,Backend Developer;AI/ML Engineer
-SKILL_03,Machine Learning,Data Science,Advanced,AI/ML Engineer;Data Scientist
+skill_id,skill_name,category,description,why_it_matters,estimated_weeks
+python,Python,Programming,"General-purpose programming language widely used in data science, systems, and ML.",Python is the primary lingua franca for ML/AI and rapid prototyping.,0
+cpp,C++,Programming,"High-performance compiled language, standard for algorithms and competitive coding.","Provides deep intuition about memory management, pointers, and cache efficiency.",0
+html-css,HTML / CSS,Programming,Foundational web technologies for building interactive browser interfaces.,Useful for building frontend dashboards and presenting data projects to stakeholders.,0
+git,Git,Tools,Distributed version control system for tracking code changes and team collaboration.,"Crucial for managing repositories, continuous integration, and open-source contributions.",0
+data-structures,Data Structures,Foundations,"Core memory layouts: arrays, linked lists, hash maps, binary trees, heaps, and graphs.","Prerequisite for all scalable engineering, algorithm design, and technical interviews.",3
+linear-algebra,Linear Algebra,Mathematics,"Vector spaces, matrix decomposition, eigenvalues, SVD, and high-dimensional transformations.",Linear algebra forms the structural foundation of almost all deep learning and embeddings.,4
+statistics,Statistics & Probability,Mathematics,"Probability distributions, Bayes theorem, hypothesis testing, confidence intervals, and variance.","Provides the mathematical rigor needed to interpret loss curves, model validation, and significance.",4
+sql,SQL & Relational Databases,Databases,"Querying, joins, indexing, normalization, transactions (ACID), and schema optimization.",Data in enterprise production is stored in relational DBs. Core data extraction skill.,2
+data-analysis,Data Analysis & EDA,Data Science,"Data wrangling with Pandas, exploratory visualization with Matplotlib/Seaborn, feature cleaning.",Raw real-world datasets are noisy. Analysis is mandatory before training predictive models.,3
+machine-learning,Machine Learning,Machine Learning,"Supervised regression/classification, decision trees, boosting (XGBoost), unsupervised clustering.",The foundational pillar of modern intelligent software and predictive modeling.,6
+deep-learning,Deep Learning,Machine Learning,"Multi-layer perceptrons, backpropagation, CNNs for vision, RNNs, and Attention mechanisms.","Enables complex pattern recognition across unstructured audio, image, and textual domains.",5
+nlp,Natural Language Processing,Machine Learning,"Tokenization, embeddings, language modeling, fine-tuning, and Transformer architectures.","Powers Large Language Models (LLMs), semantic search, conversational agents, and machine translation.",3
+computer-vision,Computer Vision,Machine Learning,"Image processing, convolution kernels, object detection (YOLO), segmentation, and generative diffusion.","Applied across autonomous driving, robotics, biomedical imaging, and satellite analytics.",3
+mlops,MLOps & Deployment,Tools,"Containerizing models with Docker, experiment tracking with MLflow, FastAPI serving, and CI/CD pipelines.","Bridges theoretical ML notebooks and scalable, high-availability production services.",3
+cloud-basics,Cloud Computing (AWS / GCP),Tools,"Virtual machines, object storage (S3), serverless compute, and container orchestration.","Industry workflows almost exclusively operate on AWS, Azure, or Google Cloud.",2
+algorithms,Algorithms,Foundations,"Sorting, searching, recursion, dynamic programming and complexity analysis.","Algorithmic thinking is tested in interviews, GATE and is the base of efficient software.",4
+oop,Object-Oriented Programming,Programming,"Classes, inheritance, encapsulation and design principles.",Real-world codebases are organised around OOP concepts.,3
+os-fundamentals,Operating Systems,Foundations,"Processes, threads, memory management, scheduling and file systems.",Understanding the OS explains how every program actually runs.,3
+computer-networks,Computer Networks,Foundations,"TCP/IP, HTTP, DNS, routing and network layers.",Every modern application and security tool depends on networking.,3
+backend-apis,Backend & APIs,Programming,"Building REST APIs, authentication and database-backed services.",APIs are how software components and products talk to each other.,4
+testing,Testing & Quality,Tools,"Unit tests, integration tests and CI basics.",Tested code is what teams are willing to ship.,2
+system-design,System Design,Foundations,"Scalability, caching, load balancing and data modelling.",System design separates junior from mid-level engineers.,4
+cryptography,Cryptography,Mathematics,"Symmetric and public-key encryption, hashing and TLS.",Cryptography protects data in transit and at rest.,3
+network-security,Network Security,Foundations,"Firewalls, IDS/IPS, VPNs and secure network design.",Most attacks cross a network boundary.,3
+web-security,Web Security,Programming,"OWASP Top 10: injection, XSS, CSRF and broken authentication.",Web apps are the most common attack surface.,3
+ethical-hacking,Ethical Hacking,Tools,"Reconnaissance, exploitation and penetration-testing methodology.",Thinking like an attacker is how defences get tested.,4
+incident-response,Incident Response,Tools,"Detection, triage, forensics and reporting of security incidents.",Security teams are judged on how they respond when things break.,3
+engineering-math,Engineering Mathematics,Mathematics,"Calculus, linear algebra, probability and numerical methods.",A significant portion of the GATE paper is mathematics.,5
+discrete-math,Discrete Mathematics,Mathematics,"Logic, sets, graphs, combinatorics and recurrences.",Foundation for algorithms and theory of computation.,4
+digital-logic,Digital Logic,Foundations,"Boolean algebra, combinational and sequential circuits.",Base for computer organisation questions.,3
+comp-org,Computer Organization,Foundations,"CPU design, pipelining, memory hierarchy and I/O.",High-weightage GATE subject.,4
+toc,Theory of Computation,Foundations,"Automata, regular languages, context-free grammars and decidability.",Core theory subject with predictable GATE patterns.,4
+compiler-design,Compiler Design,Foundations,"Lexical analysis, parsing and code generation.",Scoring subject once TOC is clear.,3
+dbms,Database Management Systems,Databases,"ER models, normalisation, transactions and indexing.",Consistently tested in GATE and interviews.,3
+gate-aptitude,General Aptitude,Aptitude & Management,Verbal and numerical reasoning for GATE.,15% of the GATE paper - easy marks if practised.,3
+gate-practice,GATE Mock Tests,Foundations,Full-length timed mock tests and error analysis.,Mock performance is the best predictor of your final rank.,4
+gre-quant,GRE Quantitative,Aptitude & Management,Quantitative reasoning for the GRE.,A strong quant score is expected for technical MS programmes.,4
+gre-verbal,GRE Verbal,Aptitude & Management,Reading comprehension and vocabulary for the GRE.,Contributes to overall GRE competitiveness.,4
+english-test,IELTS / TOEFL,Aptitude & Management,English proficiency exam preparation.,Most universities require a minimum score.,3
+research-exposure,Projects & Research Experience,Academic Research,"Final-year project, internship or publication experience.",Admissions committees weigh research and project experience heavily.,5
+university-shortlist,University Shortlisting,General Studies,"Researching programmes, deadlines and fit.",A good shortlist balances ambition with realistic chances.,2
+sop-writing,Statement of Purpose,General Studies,Writing a clear and personal SOP.,The SOP is where you tell your story.,3
+application-docs,Recommendations & Documents,General Studies,"Letters of recommendation, transcripts and forms.","Complete, on-time applications avoid avoidable rejection.",2
+funding-visa,Funding & Visa Planning,General Studies,"Scholarships, loans and visa process.",Financial planning decides whether an offer is actionable.,2
+quant-aptitude,Quantitative Aptitude,Aptitude & Management,"Arithmetic, algebra, geometry and number systems.",Quant is a make-or-break section in CAT-style exams.,5
+logical-reasoning,Logical Reasoning,Aptitude & Management,"Puzzles, arrangements, sets and logical deduction.",Forms half of the LRDI section.,4
+verbal-ability,Verbal Ability,Aptitude & Management,"Reading comprehension, para-jumbles and grammar.",Verbal skill also feeds directly into interviews.,4
+data-interpretation,Data Interpretation,Aptitude & Management,"Reading tables, charts and caselets quickly.",Needs both calculation speed and logical thinking.,3
+business-fundamentals,Business Fundamentals,Aptitude & Management,"Marketing, finance, operations and current business news.",Interviewers expect business awareness.,3
+cat-mocks,Mock Exams,Aptitude & Management,Timed mocks with sectional analysis.,"Mocks build speed, strategy and stamina.",4
+gd-pi,Group Discussion & Interview,Aptitude & Management,GD practice and personal interview preparation.,Final selection depends on GD/PI performance.,3
+polity,Indian Polity,General Studies,"Constitution, governance and institutions.","Polity is a high-scoring, high-weightage GS subject.",5
+indian-history,History,General Studies,"Ancient, medieval, modern history and culture.",Appears in both Prelims and Mains.,4
+geography,Geography,General Studies,"Physical, human and Indian geography.",Overlaps with environment and current affairs.,4
+economy,Indian Economy,General Studies,"Macroeconomics, budgeting and economic survey.",Linked to many current-affairs questions.,4
+environment,Environment & Ecology,General Studies,"Ecology, biodiversity and climate policy.",Increasingly weighted in Prelims.,3
+current-affairs,Current Affairs,General Studies,Daily news analysis linked to the syllabus.,Connects static knowledge to what is happening now.,3
+ethics,Ethics & Integrity,General Studies,"Ethics, aptitude and case studies.",GS Paper 4 rewards structured thinking.,3
+csat,CSAT,Aptitude & Management,"Comprehension, reasoning and basic numeracy.",Qualifying paper - failing it ends the attempt.,4
+essay-writing,Essay Writing,General Studies,Structured essays with examples and balance.,A full paper in Mains.,3
+answer-writing,Answer Writing,General Studies,"Writing concise, structured Mains answers.",Mains is a writing exam - practice decides the score.,4
+prelims-mocks,Prelims Mock Tests,General Studies,Test series and revision cycles.,Mocks calibrate accuracy and negative marking.,4
+research-methods,Research Methods,Academic Research,"Formulating questions, designing studies and validity.",The foundation of all academic work.,4
+literature-review,Literature Review,Academic Research,"Finding, reading and synthesising papers.",Shows you know where the field stands.,4
+academic-writing,Academic Writing,Academic Research,"Writing papers in a clear, structured style.",Publications are the currency of research.,3
+research-proposal,Research Proposal,Academic Research,Writing a focused proposal with a feasible plan.,The proposal is the centre of a PhD application.,4
+publication-record,First Publication,Academic Research,Producing a workshop or conference paper.,A publication strongly signals research readiness.,6
+faculty-outreach,Supervisor Outreach,General Studies,Identifying and contacting potential supervisors.,Supervisor fit matters as much as the institution.,2

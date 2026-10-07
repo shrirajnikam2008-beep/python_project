@@ -1,4 +1,5 @@
 import type { Skill } from '@/lib/types'
+import { resolveSkillById, normalizeSkillId } from '@/lib/skill-taxonomy'
 
 export const mockSkills: Skill[] = [
   // ── Already completed ──────────────────────────────────────────────
@@ -418,9 +419,12 @@ export function getSkillsForDestination(
     })
   })
 
+  const normalizedCurrent = currentSkillIds.map((s) => normalizeSkillId(s))
+
   return destinationSkills.map((skill, index) => {
-    const isCompleted = currentSkillIds.includes(skill.id)
-    const prereqsMet = skill.prerequisites.every((pid) => currentSkillIds.includes(pid))
+    const normId = normalizeSkillId(skill.id)
+    const isCompleted = normalizedCurrent.includes(normId)
+    const prereqsMet = skill.prerequisites.every((pid) => normalizedCurrent.includes(normalizeSkillId(pid)))
     const status: Skill['status'] = isCompleted ? 'completed' : prereqsMet ? 'next' : 'locked'
 
     const dependentsCount = dependentMap[skill.id]?.length ?? 0
@@ -443,15 +447,55 @@ export function getSkillsForDestination(
   })
 }
 
-export const getSkillById = (id: string): Skill | undefined =>
-  allSkills.find((s) => s.id === id) ?? mockSkills.find((s) => s.id === id)
+export const getSkillById = (id: string): Skill | undefined => {
+  const norm = normalizeSkillId(id)
+  const found = allSkills.find((s) => normalizeSkillId(s.id) === norm) ?? mockSkills.find((s) => normalizeSkillId(s.id) === norm)
+  if (found) return found
+
+  const canonical = resolveSkillById(id)
+  if (canonical) {
+    return {
+      id: canonical.id,
+      name: canonical.name,
+      category: canonical.category,
+      description: canonical.description,
+      currentLevel: 'Beginner',
+      requiredLevel: 'Intermediate',
+      status: 'completed',
+      priority: 'recommended',
+      prerequisites: [],
+      dependents: [],
+      estimatedWeeks: 3,
+      whyItMatters: `${canonical.name} expands your multi-disciplinary foundation in ${canonical.category}.`,
+      isCustom: canonical.isCustom,
+    }
+  }
+  return undefined
+}
 
 export const getCurrentSkills = (currentSkillIds: string[], destinationId?: string): Skill[] => {
+  const normalizedCurrent = currentSkillIds.map((s) => normalizeSkillId(s))
   const destSkills = getSkillsForDestination(destinationId, currentSkillIds)
-  return destSkills.filter((s) => currentSkillIds.includes(s.id))
+  const matchedFromDest = destSkills.filter((s) => normalizedCurrent.includes(normalizeSkillId(s.id)))
+  
+  // Also include any current skills that are from other categories / custom
+  const existingIds = new Set(matchedFromDest.map((s) => normalizeSkillId(s.id)))
+  const extraSkills: Skill[] = []
+  for (const rawId of currentSkillIds) {
+    const norm = normalizeSkillId(rawId)
+    if (!existingIds.has(norm)) {
+      const resolved = getSkillById(rawId)
+      if (resolved) {
+        extraSkills.push(resolved)
+        existingIds.add(norm)
+      }
+    }
+  }
+  return [...matchedFromDest, ...extraSkills]
 }
 
 export const getSkillGaps = (currentSkillIds: string[], destinationId?: string): Skill[] => {
+  const normalizedCurrent = currentSkillIds.map((s) => normalizeSkillId(s))
   const destSkills = getSkillsForDestination(destinationId, currentSkillIds)
-  return destSkills.filter((s) => !currentSkillIds.includes(s.id) && s.status !== 'completed')
+  return destSkills.filter((s) => !normalizedCurrent.includes(normalizeSkillId(s.id)) && s.status !== 'completed')
 }

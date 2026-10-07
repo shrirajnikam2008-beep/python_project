@@ -1,0 +1,11 @@
+source_id,name,domain,source_type,trust_level,retrieval_method,verified_url,enabled
+src_aicte_sih,Smart India Hackathon Official Portal,sih.gov.in,Government,official,manual_curated,https://www.sih.gov.in,True
+src_kavach,MHA Innovation Cell Official Portal,kavach.mic.gov.in,Government,official,manual_curated,https://kavach.mic.gov.in,True
+src_google_gsoc,Google Summer of Code Portal,summerofcode.withgoogle.com,Corporate,official,manual_curated,https://summerofcode.withgoogle.com,True
+src_amazon_science,Amazon Science University Relations,amazon.science,Corporate,official,manual_curated,https://www.amazon.science,True
+src_pmrf,Prime Minister Research Fellowship Portal,pmrf.in,Government,official,manual_curated,https://www.pmrf.in,True
+src_iasc_fellow,Indian Academy of Sciences SRFP,web-japps.ias.ac.in,University,official,manual_curated,https://web-japps.ias.ac.in/fellowship2024/,True
+src_daad_wise,DAAD Germany WISE Official Portal,daad.in,University,official,manual_curated,https://www.daad.in,True
+src_devfolio,Devfolio Developer Platform,devfolio.co,Platform,recognized,manual_curated,https://devfolio.co,True
+src_idex_gov,iDEX Defence Innovation Portal,idex.gov.in,Government,official,manual_curated,https://idex.gov.in,True
+src_unstop,Unstop Academic Competitions,unstop.com,Platform,recognized,manual_curated,https://unstop.com,True

@@ -38,6 +38,19 @@ export async function createStudentProfile(profile: StudentProfile): Promise<Stu
   return profile
 }
 
+export async function updateStudentProfile(updates: Partial<StudentProfile>): Promise<StudentProfile> {
+  await delay(300)
+  const current = await getStudentProfile()
+  const updated: StudentProfile = {
+    ...current,
+    ...updates,
+  }
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('waypoint_profile', JSON.stringify(updated))
+  }
+  return updated
+}
+
 // ─── Skills ──────────────────────────────────────────────────────────────────
 
 export async function getAllSkills(
@@ -79,15 +92,89 @@ export async function getDestination(id?: string): Promise<Destination> {
   return getDestinationById(id)
 }
 
-// ─── Routes ──────────────────────────────────────────────────────────────────
+// ─── Routes & Customizations ─────────────────────────────────────────────────
+
+export interface CustomRouteRecord {
+  route: Route
+  nodes: Node<RouteNodeData>[]
+  edges: Edge[]
+  customizedAt: string
+}
+
+const CUSTOM_ROUTES_KEY = 'waypoint_custom_routes'
+
+function getCustomRouteStore(): Record<string, CustomRouteRecord> {
+  if (typeof window === 'undefined') return {}
+  try {
+    const raw = localStorage.getItem(CUSTOM_ROUTES_KEY)
+    return raw ? JSON.parse(raw) : {}
+  } catch {
+    return {}
+  }
+}
+
+function saveCustomRouteStore(store: Record<string, CustomRouteRecord>) {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(CUSTOM_ROUTES_KEY, JSON.stringify(store))
+  }
+}
+
+export function getCustomizedRouteRecord(routeId: string): CustomRouteRecord | null {
+  const store = getCustomRouteStore()
+  return store[routeId] || null
+}
+
+export async function saveCustomizedRoute(
+  routeId: string,
+  route: Route,
+  nodes: Node<RouteNodeData>[],
+  edges: Edge[]
+): Promise<Route> {
+  await delay(150)
+  const store = getCustomRouteStore()
+  const now = new Date().toISOString()
+  const updatedRoute: Route = {
+    ...route,
+    isCustomized: true,
+    lastCustomizedAt: now,
+    customVersion: (route.customVersion ?? 0) + 1,
+  }
+  store[routeId] = {
+    route: updatedRoute,
+    nodes,
+    edges,
+    customizedAt: now,
+  }
+  saveCustomRouteStore(store)
+  return updatedRoute
+}
+
+export async function resetRouteToAIGenerated(routeId: string): Promise<boolean> {
+  await delay(150)
+  const store = getCustomRouteStore()
+  if (store[routeId]) {
+    delete store[routeId]
+    saveCustomRouteStore(store)
+    return true
+  }
+  return false
+}
 
 export async function getRoutes(): Promise<Route[]> {
-  await delay(400)
-  return mockRoutes
+  await delay(300)
+  const store = getCustomRouteStore()
+  return mockRoutes.map((r) => {
+    if (store[r.id]) {
+      return store[r.id].route
+    }
+    return r
+  })
 }
 
 export async function getRoute(routeId: string): Promise<Route | null> {
-  await delay(300)
+  await delay(200)
+  const custom = getCustomizedRouteRecord(routeId)
+  if (custom) return custom.route
   return _getRouteById(routeId) ?? null
 }
 
@@ -101,27 +188,73 @@ export async function getRouteGraph(
 ): Promise<{
   nodes: Node<RouteNodeData>[]
   edges: Edge[]
+  isCustomized?: boolean
+  lastCustomizedAt?: string
 } | null> {
-  await delay(300)
+  await delay(200)
+  const custom = getCustomizedRouteRecord(routeId)
+  if (custom && custom.nodes && custom.nodes.length > 0) {
+    return {
+      nodes: custom.nodes,
+      edges: custom.edges,
+      isCustomized: true,
+      lastCustomizedAt: custom.customizedAt,
+    }
+  }
   if (!_getRouteById(routeId)) return null
-  return getRouteGraphData(routeId, destinationId, destinationTitle, currentSkillIds)
+  const base = getRouteGraphData(routeId, destinationId, destinationTitle, currentSkillIds)
+  return {
+    ...base,
+    isCustomized: false,
+  }
 }
 
 // ─── Opportunities & Action Ecosystem ────────────────────────────────────────
+import {
+  opportunityProvider,
+  type OpportunityFilterOptions,
+} from '@/lib/opportunity-provider'
+import type { OpportunitySource, OpportunitySearchResult } from '@/lib/types'
 
 export async function getOpportunities(
   destinationId?: string,
   type?: OpportunityType | 'all',
-  filterMode?: 'all' | 'trending' | 'closing-soon' | 'new-today'
+  filterMode?: 'all' | 'trending' | 'closing-soon' | 'new-today',
+  profile?: StudentProfile | null
 ): Promise<Opportunity[]> {
-  await delay(300)
-  return _getOpportunities(destinationId, type, filterMode)
+  return opportunityProvider.getOpportunities(
+    {
+      destinationId,
+      type,
+      filterMode,
+    },
+    profile
+  )
 }
 
+export async function getRecommendedOpportunities(
+  profile: StudentProfile,
+  options?: OpportunityFilterOptions
+): Promise<Opportunity[]> {
+  return opportunityProvider.getRecommendedOpportunities(profile, options)
+}
 
+export async function searchOpportunities(
+  query: string,
+  profile?: StudentProfile | null,
+  options?: OpportunityFilterOptions
+): Promise<OpportunitySearchResult> {
+  return opportunityProvider.searchOpportunities(query, profile, options)
+}
 
+export async function getOpportunity(id: string): Promise<Opportunity | null> {
+  return opportunityProvider.getOpportunity(id)
+}
 
-// ─── Auth (Mock — backed by localStorage) ─────────────────────────────────
+export async function getOpportunitySources(): Promise<OpportunitySource[]> {
+  return opportunityProvider.getSources()
+}
+
 // When FastAPI backend is ready: replace these with fetch('/api/auth/...') calls.
 // All UI consumers use this abstraction and will not need changes.
 

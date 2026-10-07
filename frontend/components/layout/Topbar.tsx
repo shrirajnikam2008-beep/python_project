@@ -102,9 +102,13 @@ export function Topbar({ title, breadcrumb, onOpenMobileNav }: TopbarProps) {
 
         {/* Student Avatar */}
         <div className="flex items-center gap-2 pl-1 sm:pl-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-slate-900 to-slate-800 text-xs font-bold text-white shadow-xs" title={user?.name ?? 'Student'}>
+          <Link
+            href="/profile"
+            className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-slate-900 to-slate-800 text-xs font-bold text-white shadow-xs hover:ring-2 hover:ring-blue-400 transition-all"
+            title="Edit Profile & Competencies"
+          >
             {initials}
-          </div>
+          </Link>
         </div>
       </div>
     </header>

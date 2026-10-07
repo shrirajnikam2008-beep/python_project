@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Waypoint — Review 2 Backend Guide (Updated)</title>
+<style>
+  @page {
+    size: A4;
+    margin: 14mm 14mm 14mm 14mm;
+    @bottom-right {
+      content: "Page " counter(page);
+      font-size: 9px;
+      color: #94a3b8;
+    }
+  }
+  * {
+    box-sizing: border-box;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #0f172a;
+    background: #ffffff;
+    line-height: 1.45;
+    font-size: 11.5px;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 6px;
+    margin-bottom: 16px;
+    font-size: 9px;
+    color: #64748b;
+    font-weight: 500;
+  }
+
+  .cover {
+    text-align: center;
+    padding: 24px 16px 16px 16px;
+    margin-bottom: 20px;
+  }
+  .brand-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #0f172a;
+    color: white;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    margin-bottom: 12px;
+  }
+  .cover h1 {
+    font-size: 28px;
+    font-weight: 900;
+    color: #0b192c;
+    letter-spacing: -0.03em;
+    margin: 0 0 6px 0;
+  }
+  .cover .sub {
+    font-size: 14px;
+    color: #1d4ed8;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .cover .sub2 {
+    font-size: 12px;
+    color: #475569;
+    margin-bottom: 12px;
+  }
+  .cover .meta {
+    display: inline-block;
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    padding: 4px 14px;
+    border-radius: 9999px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #334155;
+  }
+
+  .banner-box {
+    background: #f0fdf4;
+    border: 1px solid #86efac;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    font-size: 11px;
+    line-height: 1.45;
+  }
+  .banner-box strong {
+    color: #15803d;
+  }
+  .banner-warning {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 18px;
+    font-size: 11px;
+    line-height: 1.45;
+  }
+  .banner-warning strong {
+    color: #b45309;
+  }
+
+  h2 {
+    font-size: 15px;
+    font-weight: 800;
+    color: #0b192c;
+    border-bottom: 1.5px solid #0f172a;
+    padding-bottom: 4px;
+    margin-top: 18px;
+    margin-bottom: 10px;
+  }
+  h3 {
+    font-size: 12.5px;
+    font-weight: 800;
+    color: #1e3a8a;
+    margin-top: 12px;
+    margin-bottom: 6px;
+  }
+  
+  .section-tag {
+    display: inline-block;
+    background: #1e3a8a;
+    color: white;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .section-tag-purple {
+    background: #6b21a8;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0 14px 0;
+    font-size: 10px;
+    page-break-inside: avoid;
+  }
+  th {
+    background: #0f172a;
+    color: #ffffff;
+    text-align: left;
+    padding: 6px 8px;
+    font-weight: 700;
+    font-size: 9.5px;
+    border: 1px solid #0f172a;
+  }
+  td {
+    padding: 5px 8px;
+    border: 1px solid #e2e8f0;
+    vertical-align: top;
+    line-height: 1.35;
+  }
+  tr:nth-child(even) td {
+    background: #f8fafc;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 1.5px 6px;
+    border-radius: 4px;
+    font-size: 9px;
+    font-weight: 700;
+  }
+  .badge-critical { background: #fee2e2; color: #991b1b; border: 1px solid #f87171; }
+  .badge-high { background: #fef3c7; color: #92400e; border: 1px solid #f59e0b; }
+  .badge-rec { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+  .badge-core { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+  .badge-done { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+  .badge-next { background: #e0e7ff; color: #3730a3; border: 1px solid #a5b4fc; }
+  .badge-locked { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
+
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 9.5px;
+    background: #f1f5f9;
+    padding: 1px 4px;
+    border-radius: 3px;
+    color: #0f172a;
+    border: 1px solid #e2e8f0;
+  }
+  pre {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 9px;
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 10px 12px;
+    border-radius: 6px;
+    overflow-x: hidden;
+    line-height: 1.4;
+    margin: 6px 0 12px 0;
+    page-break-inside: avoid;
+  }
+
+  .page-break {
+    page-break-before: always;
+  }
+
+  ul, ol {
+    margin: 4px 0 10px 0;
+    padding-left: 18px;
+  }
+  li {
+    margin-bottom: 3px;
+    line-height: 1.4;
+  }
+  .checklist-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin-bottom: 5px;
+    font-size: 10.5px;
+  }
+  .box-check {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 1.5px solid #64748b;
+    border-radius: 2px;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <span>WAYPOINT — Review 2 Backend &amp; Architecture Guide</span>
+  <span>Person 2 (Engines) &amp; Person 3 (Data &amp; Platform)</span>
+</div>
+
+<div class="cover">
+  <div class="brand-logo">WAYPOINT R2</div>
+  <h1>WAYPOINT</h1>
+  <div class="sub">Review 2 Backend &amp; System Architecture Guide</div>
+  <div class="sub2">What the Two Backend Engineers Must Build, Connect, Test, and Present</div>
+  <div class="meta">Review 2 Date: Friday 9 October 2026 | Prepared Sunday 4 October 2026</div>
+</div>
+
+<div class="banner-box">
+  <strong>The Goal in One Sentence:</strong> By Review 2, a student's profile is saved in SQLite, Python reads destinations and skills from CSV data, calculates skill gaps and 3 deterministic study routes, generates the DAG React Flow graph, serves authentic live opportunities, and both engineers can explain every calculation in viva without hesitation.
+</div>
+
+<div class="banner-warning">
+  <strong>Updated for Current Repository:</strong> This guide strictly reflects your real frontend implementation (Next.js 14, 8 career destinations, 12 engineering branches, dynamic React Flow DAG generator, and authentic Opportunities &amp; Radar ecosystem). Where older plan documents disagree, <strong>this guide represents the truth</strong>.
+</div>
+
+<h2>1. What the Backend Must Deliver for Review 2</h2>
+<p>Review 2 requires 5 core operational capabilities from the backend. Everything else (Gemini LLM explainers, student crowd trails, and market weather scraping) is scheduled for Review 3.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width: 10%;">Step</th>
+      <th style="width: 28%;">What Happens</th>
+      <th style="width: 44%;">Technical Mechanism</th>
+      <th style="width: 18%;">Owner</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>1. Profile Storage</strong></td>
+      <td>Student completes onboarding. Backend saves profile and returns it on next visit.</td>
+      <td><code>POST /api/student/profile</code> (Header: <code>X-User-Id</code>). Saves into SQLite table <code>profiles</code>.</td>
+      <td><strong>Person 3</strong></td>
+    </tr>
+    <tr>
+      <td><strong>2. Registry Data</strong></td>
+      <td>Backend provides destinations, skills, prerequisites, and verified opportunities.</td>
+      <td>Reads <code>data/*.csv</code> via cached <code>data_loader.py</code>. <code>GET /api/destinations</code>.</td>
+      <td><strong>Person 3</strong></td>
+    </tr>
+    <tr>
+      <td><strong>3. Skill Gap Engine</strong></td>
+      <td>Computes exact gap numbers, prerequisite blockers, and priority labels.</td>
+      <td><code>POST /api/skills/gap-analysis</code> via deterministic math in <code>skill_gap.py</code>.</td>
+      <td><strong>Person 2</strong></td>
+    </tr>
+    <tr>
+      <td><strong>4. Route &amp; DAG Builder</strong></td>
+      <td>Generates Fast Track, Balanced, and Foundation routes with React Flow nodes/edges.</td>
+      <td><code>POST /api/routes</code> and <code>POST /api/routes/{id}/graph</code> via <code>route_builder.py</code>.</td>
+      <td><strong>Person 2</strong></td>
+    </tr>
+    <tr>
+      <td><strong>5. Opportunities Radar</strong></td>
+      <td>Returns authentic hackathons, research fellowships, internships, and startup incubators.</td>
+      <td><code>GET /api/opportunities</code>. Reads <code>data/opportunities.csv</code> with daily trending scores.</td>
+      <td><strong>Person 3 &amp; 2</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>End-to-End Execution Flow</h3>
+<pre>
+Student Onboarding (Frontend)
+   │  POST /api/student/profile (Header: X-User-Id)  ──>  Person 3 saves to SQLite DB
+   ▼
+Choose Destination &amp; View Details
+   │  GET /api/destinations                          ──>  Person 3 serves from destinations.csv
+   ▼
+Skill Gaps Screen
+   │  POST /api/skills/gap-analysis                  ──>  Person 2: skill_gap.py (Mathematical Gaps)
+   ▼
+Routes Overview Screen
+   │  POST /api/routes                               ──>  Person 2: route_builder.py (3 Timeline Schedules)
+   ▼
+Interactive Route DAG Map
+   │  POST /api/routes/{routeId}/graph               ──>  Person 2: Topological Graph (Nodes + Edges)
+   ▼
+Opportunities &amp; Action Radar
+      GET /api/opportunities?destination=...         ──>  Person 3 &amp; 2: Verified Govt &amp; Industry Programs
+</pre>
+
+<h3>Division of Responsibilities</h3>
+<table>
+  <thead>
+    <tr>
+      <th style="width: 25%;">Dimension</th>
+      <th style="width: 38%;">Person 2 — Engines (The Brain)</th>
+      <th style="width: 37%;">Person 3 — Data &amp; Platform (The Memory)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>In Simple Words</strong></td>
+      <td>The algorithms: mathematics, prerequisite graph traversal, scheduling timelines, and DAG layout.</td>
+      <td>The storage: CSV data schemas, validation scripts, SQLite database, and web server wiring.</td>
+    </tr>
+    <tr>
+      <td><strong>Owned Files</strong></td>
+      <td>
+        <code>services/skill_gap.py</code><br>
+        <code>services/route_builder.py</code><br>
+        <code>schemas/skill.py</code>, <code>schemas/route.py</code><br>
+        <code>routers/skills.py</code>, <code>routers/routes.py</code><br>
+        <code>tests/test_skill_gap.py</code><br>
+        <code>tests/test_route_builder.py</code>
+      </td>
+      <td>
+        <code>data/*.csv</code> (5 canonical CSVs)<br>
+        <code>scripts/validate_data.py</code><br>
+        <code>services/data_loader.py</code><br>
+        <code>core/database.py</code>, <code>core/config.py</code><br>
+        <code>models/profile.py</code>, <code>schemas/profile.py</code><br>
+        <code>routers/student.py</code>, <code>routers/destinations.py</code><br>
+        <code>main.py</code>, <code>tests/test_data.py</code>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="page-break"></div>
+
+<div class="page-header">
+  <span>WAYPOINT — Review 2 Backend &amp; Architecture Guide</span>
+  <span>Shared Engineering Rules &amp; Repository Baseline</span>
+</div>
+
+<h2>2. Current Repository State &amp; Baseline</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Component / File</th>
+      <th>State Before</th>
+      <th>Required Review 2 Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>backend/main.py</code></td>
+      <td>Only <code>/</code> and <code>/health</code>. CORS set to <code>allow_origins=["*"]</code> with credentials.</td>
+      <td>Mount all 5 routers; configure CORS strictly for <code>http://localhost:3000</code>.</td>
+    </tr>
+    <tr>
+      <td><code>data/skills.csv</code></td>
+      <td>Only 3 dummy rows with <code>SKILL_01</code> IDs.</td>
+      <td>Populate full 68 skills using frontend slugs (<code>python</code>, <code>sql</code>, <code>cryptography</code>).</td>
+    </tr>
+    <tr>
+      <td><code>data/prerequisites.csv</code></td>
+      <td>Only 2 rows.</td>
+      <td>Populate 75 directed prerequisite dependencies across all tracks.</td>
+    </tr>
+    <tr>
+      <td><code>data/destinations.csv</code></td>
+      <td>Did not exist.</td>
+      <td>Create with all 8 real destinations matching frontend IDs.</td>
+    </tr>
+    <tr>
+      <td><code>data/destination_requirements.csv</code></td>
+      <td>Did not exist.</td>
+      <td>Create with 85 requirement mappings (skill_id, required_level, importance).</td>
+    </tr>
+    <tr>
+      <td><code>data/opportunities.csv</code></td>
+      <td>Old dummy data.</td>
+      <td>Populate with 18 verified government and international programs (SIH, Kavach, PMRF, GSoC).</td>
+    </tr>
+    <tr>
+      <td><code>requirements.txt</code></td>
+      <td>Missing <code>sqlalchemy</code> and <code>httpx</code>.</td>
+      <td>Added <code>sqlalchemy>=2.0.0</code> and <code>httpx>=0.27.0</code>.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>3. Seven Shared Rules (Must Agree on Day 1)</h2>
+<p>Inconsistent naming is the #1 cause of bugs in split frontend/backend teams. Follow these rules strictly:</p>
+
+<ol>
+  <li><strong>Skill IDs are slugs:</strong> Always use exact lowercase slugs like <code>python</code>, <code>data-structures</code>, <code>machine-learning</code>, <code>cryptography</code>. Never use arbitrary codes like <code>SKILL_01</code>.</li>
+  <li><strong>Skill Levels are words:</strong> <code>None = 0</code>, <code>Beginner = 1</code>, <code>Intermediate = 2</code>, <code>Advanced = 3</code>. Exactly match these string literals in CSVs and JSON responses.</li>
+  <li><strong>JSON is camelCase, Python is snake_case:</strong> In Pydantic models, always configure <code>populate_by_name = True</code> and <code>alias_generator = to_camel</code> so frontend gets <code>currentSkills</code>, <code>estimatedWeeks</code>, <code>totalWeeks</code>.</li>
+  <li><strong>Engines are Stateless:</strong> The skill gap and route endpoints are <code>POST</code> requests that receive the student's profile/skills and return calculations immediately. No database dependency inside engine logic.</li>
+  <li><strong>User is Identified by Header:</strong> <code>X-User-Id</code> (e.g. <code>user_1728...</code>). Person 3 stores one persistent profile per user ID in SQLite.</li>
+  <li><strong>Default Level Assumption:</strong> Listed skills in student onboarding default to <code>Intermediate</code>. The engine also accepts an optional <code>skillLevels</code> dictionary for granular overrides.</li>
+  <li><strong>Root Execution:</strong> Always run from repo root: <code>uvicorn backend.main:app --reload --port 8000</code> and <code>pytest</code>.</li>
+</ol>
+
+<div class="page-break"></div>
+
+<div class="page-header">
+  <span>WAYPOINT — Review 2 Backend &amp; Architecture Guide</span>
+  <span>Person 3 — Data &amp; Platform Implementation Guide</span>
+</div>
+
+<div class="section-tag">PERSON 3 — DATA &amp; PLATFORM</div>
+<h2>4. Person 3: Data, Storage &amp; Web Platform</h2>
+<p>Person 3 provides the knowledge base and persistence. If CSV data is corrupt or cyclic, Person 2's algorithms cannot function.</p>
+
+<h3>T3-1: The Five Canonical CSV Files in <code>data/</code></h3>
+<table>
+  <thead>
+    <tr>
+      <th style="width: 25%;">File</th>
+      <th style="width: 35%;">Columns</th>
+      <th style="width: 40%;">Description &amp; Constraints</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>skills.csv</code></td>
+      <td><code>skill_id, skill_name, category, description, why_it_matters, estimated_weeks</code></td>
+      <td>68 skills shared across all 8 destinations. Categories must belong to the 10 allowed categories.</td>
+    </tr>
+    <tr>
+      <td><code>prerequisites.csv</code></td>
+      <td><code>skill_id, prerequisite_id, dependency_strength</code></td>
+      <td>75 directed edges. States: "<code>skill_id</code> requires <code>prerequisite_id</code> first." Must be 100% cycle-free.</td>
+    </tr>
+    <tr>
+      <td><code>destinations.csv</code></td>
+      <td><code>destination_id, title, description, icon, category, avg_salary, tags</code></td>
+      <td>8 career tracks (<code>ai-ml-engineer</code>, <code>software-engineer</code>, <code>cybersecurity-engineer</code>, <code>mtech-gate</code>, etc.).</td>
+    </tr>
+    <tr>
+      <td><code>destination_requirements.csv</code></td>
+      <td><code>destination_id, skill_id, required_level, importance</code></td>
+      <td>85 requirement mappings. Levels: <code>Beginner</code>, <code>Intermediate</code>, <code>Advanced</code>. Importance: <code>core</code>, <code>supporting</code>, <code>optional</code>.</td>
+    </tr>
+    <tr>
+      <td><code>opportunities.csv</code></td>
+      <td><code>opportunity_id, title, organization, type, description, deadline, stipend_or_prize, location, eligibility, url, mode, destinations, tags, featured, trending_score</code></td>
+      <td>18 authentic, verified programs (SIH, Kavach, Amazon ML School, GSoC, DRDO, PMRF, DAAD, Hult Prize, NIDHI-EIR).</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>T3-2: <code>scripts/validate_data.py</code></h3>
+<p>Person 3 must run this validation script before committing any dataset modification. It automatically asserts:</p>
+<ul>
+  <li>Foreign key consistency: Every <code>skill_id</code> and <code>prerequisite_id</code> exists in <code>skills.csv</code>.</li>
+  <li>Every destination in <code>destination_requirements.csv</code> exists in <code>destinations.csv</code>.</li>
+  <li><strong>Acyclicity check:</strong> Depth-first search (DFS) confirms no prerequisite cycles exist ($A \to B \to A$).</li>
+  <li><strong>Closure Rule:</strong> If a destination requires a skill, it must also include all transitive prerequisites of that skill.</li>
+  <li>Minimum requirement count: Every destination must define at least 5 skills.</li>
+</ul>
+
+<h3>T3-3: <code>services/data_loader.py</code></h3>
+<p>The single source of truth for reading CSVs in Python. Person 2 never opens CSVs directly. All loaders use <code>@functools.lru_cache</code> for instant in-memory responses:</p>
+<pre>
+# services/data_loader.py interface:
+get_skill(skill_id: str) -> dict
+list_skills() -> list[dict]
+get_prerequisites(skill_id: str) -> list[str]
+get_dependents(skill_id: str) -> list[str]
+list_destinations() -> list[dict]
+get_destination(destination_id: str) -> dict | None
+get_requirements(destination_id: str) -> list[dict]
+list_opportunities(destination_id: str = None, opp_type: str = None) -> list[dict]
+</pre>
+
+<h3>T3-4: SQLite Database &amp; Profile Storage</h3>
+<ul>
+  <li><code>core/database.py</code>: Configures <code>create_engine("sqlite:///./waypoint.db")</code>, <code>SessionLocal</code>, <code>Base</code>, and <code>get_db()</code> generator.</li>
+  <li><code>models/profile.py</code>: Table <code>profiles</code> storing:
+    <code>user_id</code> (String, PK), <code>name</code> (String), <code>program</code> (String), <code>branch</code> (String), <code>semester</code> (Integer), <code>cgpa</code> (Float), <code>credits_completed</code> (Integer), <code>current_skills</code> (JSON string/list), <code>selected_destination_id</code> (String), <code>updated_at</code> (DateTime).</li>
+  <li>Tables are automatically initialized on startup via <code>Base.metadata.create_all(bind=engine)</code> in <code>main.py</code>.</li>
+</ul>
+
+<div class="page-break"></div>
+
+<div class="page-header">
+  <span>WAYPOINT — Review 2 Backend &amp; Architecture Guide</span>
+  <span>Person 2 — Algorithmic Engines Implementation Guide</span>
+</div>
+
+<div class="section-tag section-tag-purple">PERSON 2 — ENGINES</div>
+<h2>5. Person 2: Deterministic Algorithmic Engines</h2>
+<p>Person 2 builds the core algorithmic intelligence that examiners will test during viva. <strong>No black-box LLMs or non-deterministic ML models are used here</strong> — all output is pure, verifiable graph theory and mathematical scheduling.</p>
+
+<h3>T2-1: <code>services/skill_gap.py</code> — The Gap Analyzer Engine</h3>
+<p>The gap calculation algorithm operates in 8 deterministic steps:</p>
+<ol>
+  <li><strong>Current Level Evaluation:</strong> For each required destination skill, if present in student's <code>current_skills</code>, assign level <code>Intermediate (2)</code> (or read from <code>skill_levels</code> map). If not present, assign <code>None (0)</code>.</li>
+  <li><strong>Gap Value:</strong> $\text{gap} = \text{level}_{\text{required}} - \text{level}_{\text{current}}$. If $\text{gap} \le 0$, the skill is satisfied.</li>
+  <li><strong>Gap Type:</strong> If $\text{level}_{\text{current}} == \text{None} \implies \text{'full'}$; if $\text{level}_{\text{current}} > \text{None} \implies \text{'partial'}$.</li>
+  <li><strong>Prerequisite Blockers (<code>blocks_count</code>):</strong> Count how many other unsatisfied gap skills list this skill as a direct prerequisite.</li>
+  <li><strong>Priority Assignment:</strong>
+    <ul>
+      <li>If $\text{blocks\_count} \ge 2 \implies \mathbf{Critical}$ (major roadblock).</li>
+      <li>Else if $\text{importance} == \text{'core'} \implies \mathbf{High\ Priority}$.</li>
+      <li>Else $\implies \mathbf{Recommended}$.</li>
+    </ul>
+  </li>
+  <li><strong>Status for DAG Map:</strong>
+    <ul>
+      <li>$\text{completed}$: student already has the skill.</li>
+      <li>$\text{next}$: student needs the skill, and <em>all</em> its prerequisites are completed.</li>
+      <li>$\text{locked}$: student needs the skill, but one or more prerequisites are still missing.</li>
+    </ul>
+  </li>
+  <li><strong>Sorting:</strong> Sort gaps primarily by Priority ($\text{Critical} \to \text{High} \to \text{Recommended}$), secondarily by gap magnitude, and tertiarily by title.</li>
+  <li><strong>Audit Explanation:</strong> Fill a deterministic sentence template with real numbers (e.g. <em>"Required Advanced, currently at None (gap 3). Blocks 2 downstream skills you need."</em>).</li>
+</ol>
+
+<h3>Worked Verification Example: Student Alex (AI/ML Engineer)</h3>
+<p>Alex has <code>["python", "cpp", "html-css", "git"]</code>. The engine must return exactly these values:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Skill Name</th>
+      <th>Required Level</th>
+      <th>Gap</th>
+      <th>Type</th>
+      <th>Blocks</th>
+      <th>Priority</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>machine-learning</strong></td>
+      <td>Advanced (3)</td>
+      <td>3</td>
+      <td>full</td>
+      <td>2</td>
+      <td><span class="badge badge-critical">Critical</span></td>
+      <td><span class="badge badge-locked">locked</span></td>
+    </tr>
+    <tr>
+      <td><strong>data-structures</strong></td>
+      <td>Intermediate (2)</td>
+      <td>2</td>
+      <td>full</td>
+      <td>2</td>
+      <td><span class="badge badge-critical">Critical</span></td>
+      <td><span class="badge badge-next">next</span></td>
+    </tr>
+    <tr>
+      <td><strong>deep-learning</strong></td>
+      <td>Intermediate (2)</td>
+      <td>2</td>
+      <td>full</td>
+      <td>2</td>
+      <td><span class="badge badge-critical">Critical</span></td>
+      <td><span class="badge badge-locked">locked</span></td>
+    </tr>
+    <tr>
+      <td><strong>linear-algebra</strong></td>
+      <td>Intermediate (2)</td>
+      <td>2</td>
+      <td>full</td>
+      <td>3</td>
+      <td><span class="badge badge-critical">Critical</span></td>
+      <td><span class="badge badge-next">next</span></td>
+    </tr>
+    <tr>
+      <td><strong>statistics</strong></td>
+      <td>Intermediate (2)</td>
+      <td>2</td>
+      <td>full</td>
+      <td>2</td>
+      <td><span class="badge badge-critical">Critical</span></td>
+      <td><span class="badge badge-locked">locked</span></td>
+    </tr>
+    <tr>
+      <td><strong>data-analysis</strong></td>
+      <td>Intermediate (2)</td>
+      <td>2</td>
+      <td>full</td>
+      <td>1</td>
+      <td><span class="badge badge-high">High</span></td>
+      <td><span class="badge badge-locked">locked</span></td>
+    </tr>
+    <tr>
+      <td><strong>sql</strong></td>
+      <td>Intermediate (2)</td>
+      <td>2</td>
+      <td>full</td>
+      <td>1</td>
+      <td><span class="badge badge-high">High</span></td>
+      <td><span class="badge badge-locked">locked</span></td>
+    </tr>
+    <tr>
+      <td><strong>mlops</strong></td>
+      <td>Beginner (1)</td>
+      <td>1</td>
+      <td>full</td>
+      <td>0</td>
+      <td><span class="badge badge-rec">Recommended</span></td>
+      <td><span class="badge badge-locked">locked</span></td>
+    </tr>
+    <tr>
+      <td><strong>cloud-basics</strong></td>
+      <td>Beginner (1)</td>
+      <td>1</td>
+      <td>full</td>
+      <td>0</td>
+      <td><span class="badge badge-rec">Recommended</span></td>
+      <td><span class="badge badge-next">next</span> (needs git)</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="page-break"></div>
+
+<div class="page-header">
+  <span>WAYPOINT — Review 2 Backend &amp; Architecture Guide</span>
+  <span>Person 2 — Route Scheduling &amp; DAG Layout Engine</span>
+</div>
+
+<h3>T2-2: <code>services/route_builder.py</code> — Multi-Track Timeline Scheduler</h3>
+<p>A route is an ordered weekly roadmap. The engine builds three distinctive variants:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Route ID</th>
+      <th>Route Name</th>
+      <th>Workload</th>
+      <th>Concurrent Slots</th>
+      <th>Pace Factor</th>
+      <th>Skills Included</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>fast-track</code></td>
+      <td>Fast Track</td>
+      <td>High</td>
+      <td>3 skills at once</td>
+      <td>0.7× duration</td>
+      <td>Critical + High priority gaps only.</td>
+    </tr>
+    <tr>
+      <td><code>balanced</code></td>
+      <td>Balanced Route</td>
+      <td>Medium</td>
+      <td>2 skills at once</td>
+      <td>1.0× duration</td>
+      <td>Critical + High + Supporting skills (<code>isRecommended: true</code>).</td>
+    </tr>
+    <tr>
+      <td><code>foundation-first</code></td>
+      <td>Foundation First</td>
+      <td>Low</td>
+      <td>2 skills at once</td>
+      <td>1.3× duration</td>
+      <td>All gap skills (includes Optional + foundational deep-dives).</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Scheduling Algorithm:</strong></p>
+<ul>
+  <li>$\text{weeks} = \max(1, \text{round}(\text{estimated\_weeks} \times \text{pace\_factor}))$.</li>
+  <li>A skill is eligible to begin in week $W$ only after <em>all</em> its prerequisite skills have completed ($\text{weekEnd} < W$).</li>
+  <li>Available study slots are prioritized by Priority ($\text{Critical}$ first, then larger gaps).</li>
+  <li><code>totalWeeks</code> is the maximum <code>weekEnd</code> across all steps; <code>skillCount</code> is the total skills in the route.</li>
+</ul>
+
+<h3>T2-3: Topological React Flow DAG Generator</h3>
+<p>Generates the node and edge structures required by the frontend's React Flow canvas:</p>
+<ul>
+  <li><strong>Nodes:</strong> Exactly one <code>start</code> node at $(340, 20)$, completed prerequisites, active gap skills, and one final <code>goal</code> node.</li>
+  <li><strong>Topological Layering:</strong> Compute the longest prerequisite path from start to each node:
+    $$\text{layer}(S) = \max_{\text{prereqs } P}(\text{layer}(P)) + 1$$
+    $$\text{coordinate } y = 20 + \text{layer} \times 110$$
+  </li>
+  <li><strong>Horizontal Spacing:</strong> In each layer, distribute $N$ nodes symmetrically centered around $x = 340$, spaced $180\text{px}$ apart.</li>
+  <li><strong>Edges:</strong> Connect <code>prerequisite_id</code> $\to$ <code>skill_id</code> with <code>type: 'smoothstep'</code>. Connect <code>start</code> to skills with no prerequisites; connect terminal skills to <code>goal</code>. Set <code>animated: true</code> for edges leading into <code>next</code> skills.</li>
+</ul>
+
+<div class="page-break"></div>
+
+<div class="page-header">
+  <span>WAYPOINT — Review 2 Backend &amp; Architecture Guide</span>
+  <span>Complete API Contract &amp; Cheat Sheet</span>
+</div>
+
+<h2>6. Complete API Cheat Sheet (Deliver to Person 1)</h2>
+<table>
+  <thead>
+    <tr>
+      <th style="width: 28%;">Endpoint &amp; Method</th>
+      <th style="width: 8%;">Owner</th>
+      <th style="width: 32%;">Request Headers / Body</th>
+      <th style="width: 32%;">Response Shape</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>POST /api/student/profile</code></td>
+      <td>P3</td>
+      <td>Header: <code>X-User-Id</code><br>Body: <code>StudentProfile</code></td>
+      <td>Returns saved <code>StudentProfile</code> JSON</td>
+    </tr>
+    <tr>
+      <td><code>GET /api/student/profile</code></td>
+      <td>P3</td>
+      <td>Header: <code>X-User-Id</code></td>
+      <td>Returns <code>StudentProfile</code> or <code>404 Not Found</code></td>
+    </tr>
+    <tr>
+      <td><code>GET /api/destinations</code></td>
+      <td>P3</td>
+      <td>None</td>
+      <td>Returns <code>list[Destination]</code></td>
+    </tr>
+    <tr>
+      <td><code>GET /api/opportunities</code></td>
+      <td>P3</td>
+      <td>Query: <code>destination</code>, <code>type</code>, <code>filter</code></td>
+      <td>Returns <code>list[Opportunity]</code> (with daily trending scores)</td>
+    </tr>
+    <tr>
+      <td><code>POST /api/skills/gap-analysis</code></td>
+      <td>P2</td>
+      <td>Body: <code>{ destinationId, currentSkills, skillLevels? }</code></td>
+      <td><code>{ skills: list[Skill], gaps: list[SkillGap] }</code></td>
+    </tr>
+    <tr>
+      <td><code>POST /api/routes</code></td>
+      <td>P2</td>
+      <td>Body: <code>{ destinationId, currentSkills, skillLevels? }</code></td>
+      <td>Returns <code>list[Route]</code> (Fast Track, Balanced, Foundation)</td>
+    </tr>
+    <tr>
+      <td><code>POST /api/routes/{id}/graph</code></td>
+      <td>P2</td>
+      <td>Body: <code>{ destinationId, currentSkills, skillLevels? }</code></td>
+      <td><code>{ nodes: list[Node], edges: list[Edge] }</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Sample JSON Payloads</h3>
+<pre>
+// 1. Request Body for Engine Endpoints (Gap Analysis, Routes, Graph):
+{
+  "destinationId": "ai-ml-engineer",
+  "currentSkills": ["python", "cpp", "html-css", "git"],
+  "skillLevels": { "python": "Intermediate" }
+}
+
+// 2. Sample Route Object (POST /api/routes):
+{
+  "id": "fast-track",
+  "name": "Fast Track",
+  "tagline": "Move fast. Cover the critical essentials.",
+  "description": "High-intensity accelerated plan covering critical path skills.",
+  "workload": "High",
+  "totalWeeks": 16,
+  "skillCount": 7,
+  "isRecommended": false,
+  "steps": [
+    { "skillId": "data-structures", "weekStart": 1, "weekEnd": 2 },
+    { "skillId": "linear-algebra", "weekStart": 1, "weekEnd": 3 }
+  ]
+}
+
+// 3. Sample Graph Node & Edge (POST /api/routes/{routeId}/graph):
+{
+  "nodes": [
+    {
+      "id": "data-structures",
+      "type": "skillNode",
+      "position": { "x": 250, "y": 130 },
+      "data": { "skillId": "data-structures", "label": "Data Structures", "category": "Foundations", "status": "next", "priority": "critical" }
+    }
+  ],
+  "edges": [
+    { "id": "e-python-data-structures", "source": "python", "target": "data-structures", "type": "smoothstep", "animated": true }
+  ]
+}
+</pre>
+
+<div class="page-break"></div>
+
+<div class="page-header">
+  <span>WAYPOINT — Review 2 Backend &amp; Architecture Guide</span>
+  <span>Review 2 Execution Timeline &amp; Done Checklist</span>
+</div>
+
+<h2>7. Day-by-Day Implementation Plan (Sun 4 Oct – Fri 9 Oct)</h2>
+<table>
+  <thead>
+    <tr>
+      <th style="width: 14%;">Day</th>
+      <th style="width: 43%;">Person 3 — Data &amp; Platform</th>
+      <th style="width: 43%;">Person 2 — Engines</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Sun 4 Oct</strong></td>
+      <td>Generate canonical CSVs using <code>generate_seed_csvs.py</code>. Run <code>validate_data.py</code>. Update <code>requirements.txt</code>.</td>
+      <td>Write Pydantic schemas (<code>schemas/skill.py</code>, <code>schemas/route.py</code>). Build stub endpoints returning test JSON.</td>
+    </tr>
+    <tr>
+      <td><strong>Mon 5 Oct</strong></td>
+      <td>SQLite database setup, <code>models/profile.py</code>, profile router, <code>main.py</code> CORS wiring for <code>http://localhost:3000</code>.</td>
+      <td>Implement <code>skill_gap.py</code> with 8-step logic. Verify Alex's worked example test passes.</td>
+    </tr>
+    <tr>
+      <td><strong>Tue 6 Oct</strong></td>
+      <td>Write <code>services/data_loader.py</code> with LRU cache. Add <code>routers/destinations.py</code> and <code>routers/opportunities.py</code>.</td>
+      <td>Implement <code>route_builder.py</code> timeline scheduling algorithm and unit tests.</td>
+    </tr>
+    <tr>
+      <td><strong>Wed 7 Oct</strong></td>
+      <td>Write API integration tests (<code>tests/test_profile_api.py</code>, <code>tests/test_data.py</code>).</td>
+      <td>Build React Flow graph coordinate layout generator. Replace stubs with live engines.</td>
+    </tr>
+    <tr>
+      <td><strong>Thu 8 Oct</strong></td>
+      <td><strong>Integration Day:</strong> Run frontend against live FastAPI server. Practice viva questions together.</td>
+      <td><strong>Integration Day:</strong> Verify graph renders smoothly in frontend. Fix edge-case scheduling bugs.</td>
+    </tr>
+    <tr>
+      <td><strong>Fri 9 Oct</strong></td>
+      <td><strong>REVIEW 2 DEMO &amp; VIVA PRESENTATION</strong></td>
+      <td><strong>REVIEW 2 DEMO &amp; VIVA PRESENTATION</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>8. Done Checklist for Review 2</h2>
+<div class="checklist-item"><span class="box-check"></span> <code>python scripts/validate_data.py</code> exits with status 0 (no cycles, closure satisfied).</div>
+<div class="checklist-item"><span class="box-check"></span> <code>pytest</code> runs from repo root and all tests pass (0 failures).</div>
+<div class="checklist-item"><span class="box-check"></span> Saving a profile via <code>POST /api/student/profile</code> survives server restart in SQLite.</div>
+<div class="checklist-item"><span class="box-check"></span> <code>POST /api/skills/gap-analysis</code> accurately calculates gaps, blockers, and priorities.</div>
+<div class="checklist-item"><span class="box-check"></span> <code>POST /api/routes</code> generates 3 routes with valid weekly prerequisite orderings.</div>
+<div class="checklist-item"><span class="box-check"></span> <code>POST /api/routes/{routeId}/graph</code> outputs valid React Flow nodes and edges.</div>
+<div class="checklist-item"><span class="box-check"></span> <code>GET /api/opportunities</code> returns verified programs with daily rotating badges.</div>
+<div class="checklist-item"><span class="box-check"></span> Both engineers can open their own code and answer examiner questions without notes.</div>
+
+<h2>9. Viva Cheat Sheet — Say It in Plain Words</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Examiner Question</th>
+      <th>Recommended Engineering Answer</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>"Why not use an LLM (like GPT-4) to generate routes?"</strong></td>
+      <td>LLMs hallucinate prerequisite orders, are non-deterministic, cost per token, and take 3–5 seconds per call. Our topological scheduler is deterministic, instantaneous (&lt;10ms), 100% mathematically verifiable, and works offline without API costs.</td>
+    </tr>
+    <tr>
+      <td><strong>"How do you determine which skills are Critical vs High Priority?"</strong></td>
+      <td>We calculate a <code>blocks_count</code>: how many other missing skills have this skill as a direct dependency. If a skill blocks 2 or more downstream skills, it is mathematically <strong>Critical</strong> because it bottlenecks the entire journey.</td>
+    </tr>
+    <tr>
+      <td><strong>"How does the route scheduler assign weeks?"</strong></td>
+      <td>It uses a constrained bin-packing model: a skill can only start in week $W$ if all its prerequisites finished in week $\le W-1$, and subject to maximum concurrent study slots (2 for Balanced, 3 for Fast Track).</td>
+    </tr>
+    <tr>
+      <td><strong>"How is data scalability handled when adding new careers?"</strong></td>
+      <td>The engine is entirely data-driven. To add a new career track (e.g. Cloud Architect), we simply add rows to <code>destinations.csv</code> and <code>destination_requirements.csv</code>. Zero lines of Python code need to be rewritten.</td>
+    </tr>
+    <tr>
+      <td><strong>"How do you ensure authenticity of opportunities?"</strong></td>
+      <td>Every entry in <code>data/opportunities.csv</code> links directly to official government bodies (AICTE, Ministry of Defence iDEX, MoE PMRF) or global programs (Google Summer of Code, Y Combinator, DAAD) with verified URLs.</td>
+    </tr>
+  </tbody>
+</table>
+
+</body>
+</html>

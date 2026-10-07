@@ -3,7 +3,7 @@
 import { memo } from 'react'
 import { Handle, Position } from 'reactflow'
 import type { NodeProps } from 'reactflow'
-import { Check, Lock, Play, Trophy, Sparkles, Navigation } from 'lucide-react'
+import { Check, Lock, Play, Trophy, Sparkles, Navigation, Clock, Edit2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { RouteNodeData } from '@/lib/types'
 
@@ -68,7 +68,7 @@ export const SkillNode = memo(function SkillNode({ data, selected }: NodeProps<R
           </div>
           <p className="text-sm font-extrabold text-white tracking-tight">{data.label}</p>
           <span className="inline-block text-[10px] font-medium text-slate-300 mt-1 bg-white/10 px-2 py-0.5 rounded-full">
-            Review 2 Destination
+            Destination Target
           </span>
         </div>
       </div>
@@ -77,10 +77,12 @@ export const SkillNode = memo(function SkillNode({ data, selected }: NodeProps<R
 
   // 3. STANDARD SKILL NODES
   const isCompleted = data.status === 'completed'
+  const isInProgress = data.status === 'in-progress'
   const isNext = data.status === 'next'
   const isLocked = data.status === 'locked'
 
-  const catStyle = categoryColors[data.category] ?? 'text-slate-600 bg-slate-100 border-slate-200'
+  const catStyle =
+    categoryColors[data.category] ?? 'text-indigo-600 bg-indigo-50 border-indigo-100'
 
   return (
     <div className="relative group">
@@ -89,21 +91,37 @@ export const SkillNode = memo(function SkillNode({ data, selected }: NodeProps<R
         position={Position.Top}
         className={cn(
           '!border-2 !border-white !w-2.5 !h-2.5 !-top-1 shadow-2xs',
-          isCompleted ? '!bg-emerald-500' : isNext ? '!bg-blue-600' : '!bg-slate-300'
+          isCompleted
+            ? '!bg-emerald-500'
+            : isInProgress
+            ? '!bg-amber-500'
+            : isNext
+            ? '!bg-blue-600'
+            : '!bg-slate-300'
         )}
       />
 
       <div
         className={cn(
-          'w-[165px] rounded-2xl p-3.5 transition-all duration-200 select-none border-2',
+          'w-[175px] rounded-2xl p-3.5 transition-all duration-200 select-none border-2 relative',
           isCompleted
             ? 'bg-white border-emerald-300 shadow-xs hover:shadow-md hover:border-emerald-400'
+            : isInProgress
+            ? 'bg-amber-50/80 border-amber-400 shadow-md ring-2 ring-amber-200/70 hover:shadow-lg'
             : isNext
             ? 'bg-blue-50/90 border-blue-500 shadow-md shadow-blue-500/10 hover:shadow-lg ring-2 ring-blue-200/60'
             : 'bg-white border-slate-200/90 shadow-2xs hover:border-slate-300 hover:shadow-xs',
-          selected && 'scale-105 ring-4 ring-blue-400/40 z-10 shadow-lg'
+          selected && 'scale-105 ring-4 ring-blue-400/40 z-10 shadow-lg',
+          data.isEditMode && 'hover:ring-2 hover:ring-blue-400 cursor-pointer'
         )}
       >
+        {/* Edit badge if in edit mode */}
+        {data.isEditMode && (
+          <div className="absolute -top-2 -right-2 bg-blue-600 text-white rounded-full p-1 shadow-md">
+            <Edit2 className="w-2.5 h-2.5" />
+          </div>
+        )}
+
         {/* Header Icon + Title */}
         <div className="flex items-start gap-2.5 mb-2">
           <div
@@ -111,6 +129,8 @@ export const SkillNode = memo(function SkillNode({ data, selected }: NodeProps<R
               'flex h-7 w-7 shrink-0 items-center justify-center rounded-xl font-bold text-xs',
               isCompleted
                 ? 'bg-emerald-500 text-white shadow-2xs'
+                : isInProgress
+                ? 'bg-amber-500 text-white shadow-2xs animate-pulse'
                 : isNext
                 ? 'bg-blue-600 text-white shadow-xs'
                 : 'bg-slate-100 text-slate-400'
@@ -118,6 +138,8 @@ export const SkillNode = memo(function SkillNode({ data, selected }: NodeProps<R
           >
             {isCompleted ? (
               <Check className="w-3.5 h-3.5 stroke-[3]" />
+            ) : isInProgress ? (
+              <Clock className="w-3.5 h-3.5 stroke-[2.5]" />
             ) : isNext ? (
               <Play className="w-3.5 h-3.5 fill-white" />
             ) : (
@@ -126,19 +148,38 @@ export const SkillNode = memo(function SkillNode({ data, selected }: NodeProps<R
           </div>
 
           <div className="min-w-0 flex-1">
-            <h4 className="text-xs font-bold text-slate-900 leading-tight truncate">
-              {data.label}
-            </h4>
-            <span
-              className={cn(
-                'inline-block text-[9px] font-semibold px-1.5 py-0.2 rounded border mt-0.5',
-                catStyle
+            <div className="flex items-center gap-1">
+              <h4 className="text-xs font-bold text-slate-900 leading-tight truncate">
+                {data.label}
+              </h4>
+            </div>
+
+            <div className="flex items-center gap-1 mt-0.5 flex-wrap">
+              <span
+                className={cn(
+                  'inline-block text-[9px] font-semibold px-1.5 py-0.2 rounded border',
+                  catStyle
+                )}
+              >
+                {data.category}
+              </span>
+
+              {data.isCustom && (
+                <span className="inline-block text-[8px] font-extrabold uppercase px-1 py-0.2 rounded bg-amber-100 text-amber-800 border border-amber-200">
+                  CUSTOM
+                </span>
               )}
-            >
-              {data.category}
-            </span>
+            </div>
           </div>
         </div>
+
+        {/* Milestone Indicator */}
+        {data.milestone && (
+          <div className="mb-2 px-1.5 py-0.5 bg-purple-50 border border-purple-200 rounded-lg flex items-center gap-1 text-[9px] font-bold text-purple-700 truncate">
+            <Sparkles className="w-2.5 h-2.5 shrink-0 text-purple-600" />
+            <span className="truncate">{data.milestone}</span>
+          </div>
+        )}
 
         {/* Status indicator bar */}
         <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px]">
@@ -146,10 +187,16 @@ export const SkillNode = memo(function SkillNode({ data, selected }: NodeProps<R
           <span
             className={cn(
               'font-bold capitalize',
-              isCompleted ? 'text-emerald-700' : isNext ? 'text-blue-700' : 'text-slate-400'
+              isCompleted
+                ? 'text-emerald-700'
+                : isInProgress
+                ? 'text-amber-700'
+                : isNext
+                ? 'text-blue-700'
+                : 'text-slate-400'
             )}
           >
-            {isCompleted ? 'Acquired' : isNext ? 'Up Next' : 'Locked'}
+            {isCompleted ? 'Completed' : isInProgress ? 'In Progress' : isNext ? 'Up Next' : 'Planned'}
           </span>
         </div>
       </div>
@@ -159,7 +206,13 @@ export const SkillNode = memo(function SkillNode({ data, selected }: NodeProps<R
         position={Position.Bottom}
         className={cn(
           '!border-2 !border-white !w-2.5 !h-2.5 !-bottom-1 shadow-2xs',
-          isCompleted ? '!bg-emerald-500' : isNext ? '!bg-blue-600' : '!bg-slate-300'
+          isCompleted
+            ? '!bg-emerald-500'
+            : isInProgress
+            ? '!bg-amber-500'
+            : isNext
+            ? '!bg-blue-600'
+            : '!bg-slate-300'
         )}
       />
     </div>

@@ -8,9 +8,12 @@ If the API key is missing or calls fail, provides seamless graceful fallback to 
 import os
 import json
 import logging
-from typing import Optional, Dict, Any, List, Tuple
-from google import genai
-from google.genai import types
+try:
+    from google import genai
+    from google.genai import types
+except ImportError:
+    genai = None
+    types = None
 
 from backend.core.config import settings
 from backend.schemas.opportunity import (
@@ -30,7 +33,7 @@ def get_gemini_client() -> Optional[genai.Client]:
     Returns None if missing.
     """
     api_key = settings.gemini_api_key or os.getenv("GEMINI_API_KEY", "").strip()
-    if not api_key:
+    if not api_key or genai is None:
         return None
     try:
         return genai.Client(api_key=api_key)
